@@ -1,4 +1,4 @@
-import type { ActivityItem, AppointmentTrendPoint, StatsSummary, TestDistributionItem, UserProfile } from '../types'
+import type { ActivityItem, Appointment, AppointmentTrendPoint, Patient, StatsSummary, TestDistributionItem, UserProfile } from '../types'
 
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -62,6 +62,61 @@ export async function fetchRecentActivity(page = 1, pageSize = 5): Promise<{ ite
     message: `Activity ${(page-1)*pageSize + i + 1}: Appointment updated`
   }))
   return { items, total }
+}
+
+// Patients mock
+let patients: Patient[] = [
+  { id: 'p1', name: 'Ravi Kumar', age: 34, gender: 'Male', mobile: '9876543210' },
+  { id: 'p2', name: 'Asha Singh', age: 29, gender: 'Female', mobile: '9123456780' },
+  { id: 'p3', name: 'Mahesh Gupta', age: 45, gender: 'Male', mobile: '9988776655' },
+]
+
+export async function fetchPatients(): Promise<Patient[]> {
+  await delay(300)
+  return patients
+}
+
+export async function fetchPatientById(id: string): Promise<Patient | null> {
+  await delay(200)
+  return patients.find((p) => p.id === id) || null
+}
+
+export async function savePatient(patient: Omit<Patient, 'id'> & { id?: string }): Promise<Patient> {
+  await delay(300)
+  if (patient.id) {
+    patients = patients.map((p) => (p.id === patient.id ? (patient as Patient) : p))
+    return patient as Patient
+  }
+  const created: Patient = { ...(patient as Patient), id: `p${Date.now()}` }
+  patients.push(created)
+  return created
+}
+
+// Appointments mock
+let appointments: Appointment[] = [
+  { id: 'ap1', patientId: 'p1', patientName: 'Ravi Kumar', date: '2025-08-21', time: '10:30', doctor: 'Dr. Shah', status: 'Scheduled' },
+  { id: 'ap2', patientId: 'p2', patientName: 'Asha Singh', date: '2025-08-22', time: '12:00', doctor: 'Dr. Rao', status: 'Completed' },
+]
+
+export async function fetchAppointments(): Promise<Appointment[]> {
+  await delay(250)
+  return appointments
+}
+
+export async function fetchAppointmentById(id: string): Promise<Appointment | null> {
+  await delay(200)
+  return appointments.find((a) => a.id === id) || null
+}
+
+export async function saveAppointment(input: Omit<Appointment, 'id'> & { id?: string }): Promise<Appointment> {
+  await delay(300)
+  if (input.id) {
+    appointments = appointments.map((a) => (a.id === input.id ? (input as Appointment) : a))
+    return input as Appointment
+  }
+  const created: Appointment = { ...(input as Appointment), id: `ap${Date.now()}` }
+  appointments.push(created)
+  return created
 }
 
 
