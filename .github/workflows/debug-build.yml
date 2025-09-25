@@ -1,0 +1,50 @@
+name: Debug Build Process
+
+on:
+  push:
+    branches: [ login ]
+  workflow_dispatch:
+
+jobs:
+  debug_build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: LandingPage/package-lock.json
+        
+    - name: List directory structure
+      run: |
+        echo "=== Root directory ==="
+        ls -la
+        echo "=== LandingPage directory ==="
+        ls -la LandingPage/
+        
+    - name: Install dependencies
+      run: |
+        cd LandingPage
+        npm ci
+        
+    - name: Check if dist directory exists
+      run: |
+        echo "=== Checking dist directory ==="
+        ls -la LandingPage/dist/ || echo "dist directory does not exist"
+        
+    - name: Build React app
+      run: |
+        cd LandingPage
+        npm run build
+        
+    - name: Verify build output
+      run: |
+        echo "=== Build output ==="
+        ls -la LandingPage/dist/
+        echo "=== Firebase config ==="
+        cat firebase.json
