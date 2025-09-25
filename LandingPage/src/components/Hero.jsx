@@ -60,7 +60,7 @@ const Hero = ({ data }) => {
   
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-          <a href="http://localhost:5173/" className="bg-white  text-lg sm:text-xl px-10 py-4 sm:px-12 sm:py-5 rounded-2xl">
+          <a href="/login/index.html" className="bg-white  text-lg sm:text-xl px-10 py-4 sm:px-12 sm:py-5 rounded-2xl">
             {data.ctaText}
           </a>
         </div>

@@ -8,8 +8,8 @@ import Testimonials from "./components/Testimonials";
 import CTA from "./components/CTA";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
-import {Routes , Route} from "react-router-dom" 
-import RoleSelection from "/Users/USER/Desktop/health-automation/healthcenter_automation/login-folder/src/components/RoleSelection.jsx" ;
+import { Routes, Route } from "react-router-dom";
+import RoleSelection from "./components/RoleSelection.jsx";
 
 function App() {
   const [data, setData] = useState(null);
@@ -71,8 +71,8 @@ function App() {
 
 
     <Routes>
-      <Route path="/getStarted"  element={RoleSelection}/>
-      </Routes>
+      <Route path="/getStarted" element={<RoleSelection />} />
+    </Routes>
 
 
       {/* Hero Section */}
