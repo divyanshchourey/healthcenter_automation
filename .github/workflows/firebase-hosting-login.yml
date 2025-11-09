@@ -21,7 +21,16 @@ jobs:
           node-version: 18
           cache: npm
           cache-dependency-path: |
+            login-folder/package-lock.json
             LandingPage/package-lock.json
+
+      - name: Install deps (login-folder)
+        working-directory: login-folder
+        run: npm ci
+
+      - name: Build (login-folder)
+        working-directory: login-folder
+        run: npm run build
 
       - name: Install deps (LandingPage)
         working-directory: LandingPage

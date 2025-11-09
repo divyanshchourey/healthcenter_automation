@@ -75,8 +75,16 @@ export const validateRegisterForm = (formData, extraFields = []) => {
     errors.licenseNumber = 'License number is required';
   }
   
-  if (extraFields.includes('emergencyContact') && !formData.emergencyContact) {
-    errors.emergencyContact = 'Emergency contact is required';
+  if (extraFields.includes('dateOfBirth') && !formData.dateOfBirth) {
+    errors.dateOfBirth = 'Date of birth is required';
+  }
+  
+  if (extraFields.includes('gender') && !formData.gender) {
+    errors.gender = 'Gender is required';
+  }
+  
+  if (extraFields.includes('address') && !formData.address) {
+    errors.address = 'Address is required';
   }
   
   return errors;

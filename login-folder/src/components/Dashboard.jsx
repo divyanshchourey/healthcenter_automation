@@ -1,9 +1,24 @@
 // components/Dashboard.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UserCheck } from 'lucide-react';
 import { getRoleConfig } from '../utils/roleConfig.jsx';
 
 const Dashboard = ({ user, onLogout }) => {
+  // Validate that user is authenticated and has required data
+  useEffect(() => {
+    if (!user || !user.email || !user.userId) {
+      // If user data is invalid, redirect to logout
+      if (onLogout) {
+        onLogout();
+      }
+    }
+  }, [user, onLogout]);
+
+  // If user is not properly authenticated, don't render dashboard
+  if (!user || !user.email || !user.userId) {
+    return null;
+  }
+
   const roleConfig = getRoleConfig(user.role);
 
   return (
