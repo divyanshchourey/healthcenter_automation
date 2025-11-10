@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { User, Heart, Shield, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { getRoleConfig } from '../utils/roleConfig.jsx';
 import { validateLoginForm } from '../utils/validation.jsx';
+import { loginPatientAccount, loginDoctorAccount, loginStaffAccount } from '../services/apiService.js';
+import LoadingSpinner from './common/LoadingSpinner.jsx';
 
 const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +13,8 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [generalError, setGeneralError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const roleConfig = getRoleConfig(role);
 
@@ -29,7 +33,7 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validateLoginForm(formData);
     
     if (Object.keys(newErrors).length > 0) {
@@ -37,12 +41,122 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
       return;
     }
 
-    // Simulate login success
-    onLogin({
-      email: formData.email,
-      role: role,
-      name: `${role.charAt(0).toUpperCase() + role.slice(1)} User`
-    });
+    setGeneralError('');
+    setIsSubmitting(true);
+
+    try {
+      // For patient role, use the patient-specific login endpoint
+      if (role === 'patient') {
+        const loginResponse = await loginPatientAccount({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        // Validate the response to ensure authentication was successful
+        if (!loginResponse || !loginResponse.user) {
+          throw new Error('Invalid response from server. Please try again.');
+        }
+
+        // Validate that the user is actually a patient (roleID = 3)
+        if (loginResponse.user.RoleID !== 3) {
+          throw new Error('Access denied. This account is not authorized for patient access.');
+        }
+
+        // Validate required user fields
+        if (!loginResponse.user.Email || !loginResponse.user.UserID) {
+          throw new Error('Invalid user data received. Please try again.');
+        }
+
+        // Only proceed with login if all validations pass
+        onLogin({
+          email: loginResponse.user.Email,
+          role: role,
+          name: `${loginResponse.user.FirstName} ${loginResponse.user.LastName ?? ''}`.trim() || loginResponse.user.Email,
+          userId: loginResponse.user.UserID,
+          roleId: loginResponse.user.RoleID,
+        });
+      } else if (role === 'doctor') {
+        // Authenticate doctor using general /auth/login and enforce RoleID = 2
+        const loginResponse = await loginDoctorAccount({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (!loginResponse || !loginResponse.user) {
+          throw new Error('Invalid response from server. Please try again.');
+        }
+
+        if (loginResponse.user.RoleID !== 2) {
+          throw new Error('Access denied. This account is not authorized for doctor access.');
+        }
+
+        if (!loginResponse.user.Email || !loginResponse.user.UserID) {
+          throw new Error('Invalid user data received. Please try again.');
+        }
+
+        onLogin({
+          email: loginResponse.user.Email,
+          role: role,
+          name: `${loginResponse.user.FirstName} ${loginResponse.user.LastName ?? ''}`.trim() || loginResponse.user.Email,
+          userId: loginResponse.user.UserID,
+          roleId: loginResponse.user.RoleID,
+        });
+      } else if (role === 'staff') {
+        // Authenticate staff member using general /auth/login (same as doctor)
+        const loginResponse = await loginStaffAccount({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (!loginResponse || !loginResponse.user) {
+          throw new Error('Invalid response from server. Please try again.');
+        }
+
+        // Validate that the user is actually a staff member (RoleID = 4, typically)
+        // Adjust RoleID validation based on your backend configuration
+        if (loginResponse.user.RoleID !== 4) {
+          throw new Error('Access denied. This account is not authorized for staff access.');
+        }
+
+        if (!loginResponse.user.Email || !loginResponse.user.UserID) {
+          throw new Error('Invalid user data received. Please try again.');
+        }
+
+        onLogin({
+          email: loginResponse.user.Email,
+          role: role,
+          name: `${loginResponse.user.FirstName} ${loginResponse.user.LastName ?? ''}`.trim() || loginResponse.user.Email,
+          userId: loginResponse.user.UserID,
+          roleId: loginResponse.user.RoleID,
+        });
+      } else if (role === 'admin') {
+        // For admin role, use a simple validation (you can add admin-specific API later)
+        // For now, allow any valid email/password combination and assign admin role
+        if (formData.email && formData.password) {
+          onLogin({
+            email: formData.email,
+            role: 'admin',
+            name: 'Admin User',
+            userId: 1,
+            roleId: 1,
+          });
+        } else {
+          throw new Error('Please enter valid email and password.');
+        }
+      } else {
+        // For other roles, keep placeholder until specific endpoints are implemented
+        onLogin({
+          email: formData.email,
+          role: role,
+          name: `${role.charAt(0).toUpperCase() + role.slice(1)} User`
+        });
+      }
+    } catch (error) {
+      setGeneralError(error.message || 'Login failed. Please check your credentials and try again.');
+      // Don't call onLogin if there's an error - this prevents dashboard from opening
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -67,6 +181,11 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
 
           {/* Login Form */}
           <div className="space-y-6">
+            {generalError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+                {generalError}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -117,13 +236,22 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
 
             <button
               onClick={handleSubmit}
+              disabled={isSubmitting}
               className={`
                 w-full py-3 px-4 bg-gradient-to-r ${roleConfig.color}
                 text-white font-medium rounded-lg hover:shadow-lg transform transition-all duration-200
                 hover:scale-105 focus:ring-4 focus:ring-blue-300
+                ${isSubmitting ? 'opacity-80 cursor-not-allowed' : ''}
               `}
             >
-              Sign In
+              {isSubmitting ? (
+                <span className="flex items-center justify-center space-x-2">
+                  <LoadingSpinner size="small" color="gray" />
+                  <span>Signing in...</span>
+                </span>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </div>
 

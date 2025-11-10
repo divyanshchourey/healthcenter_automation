@@ -34,6 +34,7 @@ const RoleSelection = ({ onRoleSelect }) => {
       gradient: "from-indigo-500 to-indigo-600",
       hover: "hover:from-indigo-600 hover:to-indigo-700",
     },
+
   ];
 
   return (
@@ -50,7 +51,7 @@ const RoleSelection = ({ onRoleSelect }) => {
         </div>
 
         {/* Role Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {roles.map((role) => (
             <div
               key={role.id}
