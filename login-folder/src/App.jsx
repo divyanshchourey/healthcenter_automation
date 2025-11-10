@@ -77,6 +77,32 @@ const AppContent = () => {
           }
         }} />} />
         
+<<<<<<< HEAD
+        {/* Direct Admin Access Route */}
+        <Route path="/login/admin" element={
+          <AdminDashboardWrapper user={{ role: 'admin', roleId: 1, name: 'Admin User' }} onLogout={handleLogout} />
+        } />
+        
+        <Route path="/login" element={
+          isLoggedIn ? (
+            currentUser?.role === 'patient' || currentUser?.roleId === 3 ? 
+              <Navigate to="/patient/dashboard" replace /> : 
+              currentUser?.role === 'doctor' || currentUser?.roleId === 2 ?
+              <Navigate to="/doctor/dashboard" replace /> :
+              currentUser?.role === 'staff' || currentUser?.roleId === 4 ?
+              <Navigate to="/staff/dashboard" replace /> :
+              currentUser?.role === 'admin' || currentUser?.roleId === 1 ?
+              <Navigate to="/admin/dashboard" replace /> :
+              <Navigate to="/dashboard" replace />
+          ) : 
+          location.state?.role ? (
+            <LoginPage
+              role={location.state.role}
+              onBack={() => navigate('/')}
+              onRegister={() => navigate('/register', { state: { role: location.state.role } })}
+              onLogin={handleLoginSuccess}
+            />
+=======
         {/* Direct Admin Access Route */}
         <Route path="/login/admin" element={
           <AdminDashboardWrapper user={{ role: 'admin', roleId: 1, name: 'Admin User' }} onLogout={handleLogout} />

@@ -1,0 +1,41 @@
+name: Deploy to Firebase Hosting (CLI)
+
+on:
+  push:
+    branches: [ main, master, login ]
+  pull_request:
+    branches: [ main, master, login ]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: LandingPage/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd LandingPage
+        npm ci
+        
+    - name: Build React app
+      run: |
+        cd LandingPage
+        npm run build
+        
+    - name: Install Firebase CLI
+      run: npm install -g firebase-tools
+        
+    - name: Deploy to Firebase
+      run: |
+        firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

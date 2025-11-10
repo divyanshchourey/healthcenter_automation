@@ -21,7 +21,16 @@ jobs:
           node-version: 18
           cache: npm
           cache-dependency-path: |
+            login-folder/package-lock.json
             LandingPage/package-lock.json
+
+      - name: Install deps (login-folder)
+        working-directory: login-folder
+        run: npm ci
+
+      - name: Build (login-folder)
+        working-directory: login-folder
+        run: npm run build
 
       - name: Install deps (LandingPage)
         working-directory: LandingPage
@@ -31,23 +40,12 @@ jobs:
         working-directory: LandingPage
         run: npm run build
 
-      # Option A: Use Service Account JSON (recommended)
-      - name: Deploy to Firebase Hosting (live)
-        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          channelId: live
-          entryPoint: .
-        env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      # Deploy to Firebase Hosting
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
-      # Option B: Use legacy CLI token if provided
-      - name: Deploy with firebase-tools using token (fallback)
-        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT == '' && secrets.FIREBASE_TOKEN != '' }}
+      - name: Deploy to Firebase Hosting
         run: |
-          npm i -g firebase-tools
           firebase deploy --only hosting --non-interactive --force
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
