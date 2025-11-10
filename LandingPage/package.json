@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "predev": "npm --prefix ../login-folder run build",
+    "prebuild": "npm --prefix ../login-folder run build",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

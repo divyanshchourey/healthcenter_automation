@@ -84,23 +84,7 @@ const Contact = ({ data }) => {
                 </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="company"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Company/Organization
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-colors duration-200"
-                  placeholder="Your company name"
-                />
-              </div>
+               
 
               <div>
                 <label
@@ -122,7 +106,7 @@ const Contact = ({ data }) => {
               </div>
 
               <button type="submit" className="w-full btn-primary text-lg py-4">
-                {data.ctaText}
+                Submit
               </button>
             </form>
           </div>

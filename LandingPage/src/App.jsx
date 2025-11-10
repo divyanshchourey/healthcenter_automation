@@ -9,7 +9,7 @@ import CTA from "./components/CTA";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import { Routes, Route } from "react-router-dom";
-import RoleSelection from "./components/RoleSelection.jsx";
+import RoleSelection from "../../login-folder/src/components/RoleSelection.jsx";
 
 function App() {
   const [data, setData] = useState(null);
@@ -80,27 +80,7 @@ function App() {
         <Hero data={data.hero} />
       </section>
 
-      {/* Features Section */}
-      {/* {data.features && (
-        <section id="features">
-          <Features data={data.features} />
-        </section>
-      )} */}
-
-      {/* How It Works Section */}
-      {/* {data.howItWorks && (
-        <section id="how-it-works">
-          <HowItWorks data={data.howItWorks} />
-        </section>
-      )} */}
-
-      {/* Benefits Section */}
-      {/* {data.benefits && (
-        <section id="benefits">
-          <Benefits data={data.benefits} />
-        </section>
-      )} */}
-
+       
       {/* Testimonials Section */}
       {data.testimonials && (
         <section id="testimonials">

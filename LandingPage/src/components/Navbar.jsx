@@ -62,26 +62,7 @@ const Navbar = () => {
               >
                 Home
               </button>
-              <button
-                onClick={() => scrollToSection("features")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isScrolled
-                    ? "text-gray-700 hover:text-gray-900"
-                    : "text-gray-200 hover:text-white"
-                }`}
-              >
-                Features
-              </button>
-              <button
-                onClick={() => scrollToSection("how-it-works")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isScrolled
-                    ? "text-gray-700 hover:text-gray-900"
-                    : "text-gray-200 hover:text-white"
-                }`}
-              >
-                How It Works
-              </button>
+              
               <button
                 onClick={() => scrollToSection("testimonials")}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
@@ -102,16 +83,7 @@ const Navbar = () => {
               >
                 Contact
               </button>
-              <button
-                onClick={() => scrollToSection("contact")}
-                className={`ml-4 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isScrolled
-                    ? "bg-gray-900 text-white hover:bg-gray-800"
-                    : "bg-white text-gray-900 hover:bg-gray-100"
-                }`}
-              >
-                Get Started
-              </button>
+              
             </div>
           </div>
 
@@ -183,26 +155,7 @@ const Navbar = () => {
             >
               Home
             </button>
-            <button
-              onClick={() => scrollToSection("features")}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
-              }`}
-            >
-              Features
-            </button>
-            {/* <button
-              onClick={() => scrollToSection("how-it-works")}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
-              }`}
-            >
-              How It Works
-            </button> */}
+             
             <button
               onClick={() => scrollToSection("testimonials")}
               className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
@@ -223,16 +176,7 @@ const Navbar = () => {
             >
               Contact
             </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
-                isScrolled
-                  ? "bg-gray-900 text-white hover:bg-gray-800"
-                  : "bg-white text-gray-900 hover:bg-gray-100"
-              }`}
-            >
-              Get Started
-            </button>
+             
           </div>
         </div>
       )}

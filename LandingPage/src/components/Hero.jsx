@@ -51,12 +51,7 @@ const Hero = ({ data }) => {
           {data.subtitle}
         </p>
 
-        {/* Call to Action Button */}
-        {/* <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-          <Link to="/getStarted" className="bg-white  text-lg sm:text-xl px-10 py-4 sm:px-12 sm:py-5 rounded-2xl">
-            {data.ctaText}
-          </Link>
-        </div> */}
+        
   
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>

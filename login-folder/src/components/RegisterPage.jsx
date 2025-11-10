@@ -1,6 +1,8 @@
 // components/RegisterPage.js
 import React, { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner.jsx';
+import { registerPatientAccount } from '../services/apiService.js';
 import { getRoleConfig } from '../utils/roleConfig.jsx';
 import { validateRegisterForm } from '../utils/validation.jsx';
 
@@ -14,10 +16,14 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
     confirmPassword: '',
     specialization: '', // for doctors
     licenseNumber: '', // for doctors/staff
-    emergencyContact: '' // for patients
+    dateOfBirth: '', // for patients
+    gender: '', // for patients
+    address: '' // for patients
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [generalError, setGeneralError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const roleConfig = getRoleConfig(role);
 
@@ -36,7 +42,7 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validateRegisterForm(formData, roleConfig.extraFields);
     
     if (Object.keys(newErrors).length > 0) {
@@ -44,12 +50,51 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
       return;
     }
 
-    // Simulate registration success
-    onRegister({
-      email: formData.email,
-      role: role,
-      name: `${formData.firstName} ${formData.lastName}`
-    });
+    setGeneralError('');
+    setIsSubmitting(true);
+
+    try {
+      const registeredUser = await registerPatientAccount({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        address: formData.address,
+      });
+
+      // Validate the response to ensure registration was successful
+      if (!registeredUser) {
+        throw new Error('Invalid response from server. Please try again.');
+      }
+
+      // Validate required user fields
+      if (!registeredUser.Email || !registeredUser.UserID) {
+        throw new Error('Invalid user data received. Please try again.');
+      }
+
+      // Validate that the user is actually a patient (roleID = 3)
+      if (registeredUser.RoleID !== 3) {
+        throw new Error('Registration failed. Invalid role assigned.');
+      }
+
+      // Only proceed with registration if all validations pass
+      onRegister({
+        email: registeredUser.Email,
+        role,
+        name: `${registeredUser.FirstName} ${registeredUser.LastName ?? ''}`.trim() || registeredUser.Email,
+        userId: registeredUser.UserID,
+        roleId: registeredUser.RoleID,
+        createdAt: registeredUser.CreatedAt,
+      });
+    } catch (error) {
+      setGeneralError(error.message || 'Registration failed. Please try again.');
+      // Don't call onRegister if there's an error - this prevents dashboard from opening
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,6 +119,11 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
 
           {/* Registration Form */}
           <div className="space-y-4">
+            {generalError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+                {generalError}
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -207,24 +257,71 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
               </div>
             )}
 
-            {roleConfig.extraFields.includes('emergencyContact') && (
+            {roleConfig.extraFields.includes('dateOfBirth') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Emergency Contact
+                  Date of Birth
                 </label>
                 <input
-                  type="tel"
-                  name="emergencyContact"
-                  value={formData.emergencyContact}
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
                   onChange={handleInputChange}
                   className={`
                     w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                    ${errors.emergencyContact ? 'border-red-500' : 'border-gray-300'}
+                    ${errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'}
                   `}
-                  placeholder="Emergency contact number"
                 />
-                {errors.emergencyContact && (
-                  <p className="mt-1 text-xs text-red-600">{errors.emergencyContact}</p>
+                {errors.dateOfBirth && (
+                  <p className="mt-1 text-xs text-red-600">{errors.dateOfBirth}</p>
+                )}
+              </div>
+            )}
+
+            {roleConfig.extraFields.includes('gender') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Gender
+                </label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleInputChange}
+                  className={`
+                    w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    ${errors.gender ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+                {errors.gender && (
+                  <p className="mt-1 text-xs text-red-600">{errors.gender}</p>
+                )}
+              </div>
+            )}
+
+            {roleConfig.extraFields.includes('address') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+                <textarea
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className={`
+                    w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    ${errors.address ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                  placeholder="Enter your address"
+                />
+                {errors.address && (
+                  <p className="mt-1 text-xs text-red-600">{errors.address}</p>
                 )}
               </div>
             )}
@@ -278,14 +375,24 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
             </div>
 
             <button
+              type="button"
               onClick={handleSubmit}
+              disabled={isSubmitting}
               className={`
                 w-full py-3 px-4 bg-gradient-to-r ${roleConfig.color}
                 text-white font-medium rounded-lg hover:shadow-lg transform transition-all duration-200
                 hover:scale-105 focus:ring-4 focus:ring-blue-300 mt-6
+                ${isSubmitting ? 'opacity-80 cursor-not-allowed' : ''}
               `}
             >
-              Create Account
+              {isSubmitting ? (
+                <span className="flex items-center justify-center space-x-2">
+                  <LoadingSpinner size="small" color="gray" />
+                  <span>Creating account...</span>
+                </span>
+              ) : (
+                'Create Account'
+              )}
             </button>
           </div>
 
