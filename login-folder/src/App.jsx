@@ -98,7 +98,7 @@ const AppContent = () => {
             <LoginPage
               role={location.state.role}
               onBack={() => navigate('/')}
-              onRegister={() => navigate('/register', { state: { role: location.state.role } })}
+              onRegister={() => navigate('/register')}
               onLogin={handleLoginSuccess}
             />
           ) : (
@@ -108,16 +108,11 @@ const AppContent = () => {
         
         <Route path="/register" element={
           isLoggedIn ? <Navigate to="/patient/dashboard" replace /> :
-          location.state?.role ? (
-            <RegisterPage
-              role={location.state.role}
-              onBack={() => navigate('/login')}
-              onRegister={handleRegisterSuccess}
-              onRoleSelection={() => navigate('/')}
-            />
-          ) : (
-            <Navigate to="/" replace />
-          )
+          <RegisterPage
+            onBack={() => navigate('/login')}
+            onRegister={handleRegisterSuccess}
+            onRoleSelection={() => navigate('/')}
+          />
         } />
 
         {/* Protected Routes */}

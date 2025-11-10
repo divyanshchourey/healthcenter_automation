@@ -36,7 +36,7 @@ jobs:
         run: npm run build
 
       - name: Deploy LandingPage to Firebase Hosting
-        if: secrets.FIREBASE_SERVICE_ACCOUNT != ''
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
         run: npm run build
 
       - name: Deploy Login System to Firebase Hosting
-        if: secrets.FIREBASE_SERVICE_ACCOUNT != ''
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -112,7 +112,7 @@ jobs:
         run: npm run build
 
       - name: Deploy Admin Dashboard to Firebase Hosting
-        if: secrets.FIREBASE_SERVICE_ACCOUNT != ''
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

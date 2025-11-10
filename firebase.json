@@ -1,86 +1,29 @@
 {
-  "hosting": [
-    {
-      "target": "landing",
-      "public": "LandingPage/dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "cleanUrls": true,
-      "rewrites": [
-        { "source": "**", "destination": "/index.html" }
-      ],
-      "headers": [
-        {
-          "source": "**/*.@(js|css)",
-          "headers": [
-            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-          ]
-        },
-        {
-          "source": "index.html",
-          "headers": [
-            { "key": "Cache-Control", "value": "no-cache" }
-          ]
-        }
-      ]
-    },
-    {
-      "target": "login",
-      "public": "login-folder/dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "cleanUrls": true,
-      "rewrites": [
-        { "source": "**", "destination": "/index.html" }
-      ],
-      "headers": [
-        {
-          "source": "**/*.@(js|css)",
-          "headers": [
-            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-          ]
-        },
-        {
-          "source": "index.html",
-          "headers": [
-            { "key": "Cache-Control", "value": "no-cache" }
-          ]
-        }
-      ]
-    },
-    {
-      "target": "admin",
-      "public": "health-admin-dashboard/dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "cleanUrls": true,
-      "rewrites": [
-        { "source": "**", "destination": "/index.html" }
-      ],
-      "headers": [
-        {
-          "source": "**/*.@(js|css)",
-          "headers": [
-            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-          ]
-        },
-        {
-          "source": "index.html",
-          "headers": [
-            { "key": "Cache-Control", "value": "no-cache" }
-          ]
-        }
-      ]
-    }
-  ]
+  "hosting": {
+    "public": "LandingPage/dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        ]
+      },
+      {
+        "source": "index.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      }
+    ]
+  }
 }
 
