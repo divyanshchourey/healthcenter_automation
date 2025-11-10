@@ -11,31 +11,32 @@ on:
 
 jobs:
   build-and-deploy-landing:
+    name: Deploy Landing Page
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
+      - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: |
-            LandingPage/package-lock.json
+          cache-dependency-path: LandingPage/package-lock.json
 
-      - name: Install deps (LandingPage)
+      - name: Install dependencies
         working-directory: LandingPage
         run: npm ci
 
-      - name: Build (LandingPage)
+      - name: Build Landing Page
         working-directory: LandingPage
         run: npm run build
 
-      - name: Deploy LandingPage to Firebase Hosting
+      - name: Deploy Landing Page to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -43,32 +44,32 @@ jobs:
           projectId: health-centre-automation
           channelId: live
           target: landing
-          entryPoint: .
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
 
   build-and-deploy-login:
+    name: Deploy Login System
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
+      - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: |
-            login-folder/package-lock.json
+          cache-dependency-path: login-folder/package-lock.json
 
-      - name: Install deps (Login System)
+      - name: Install dependencies
         working-directory: login-folder
         run: npm ci
 
-      - name: Build (Login System)
+      - name: Build Login System
         working-directory: login-folder
         run: npm run build
 
@@ -80,32 +81,32 @@ jobs:
           projectId: health-centre-automation
           channelId: live
           target: login
-          entryPoint: .
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
 
   build-and-deploy-admin:
+    name: Deploy Admin Dashboard
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
+      - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: |
-            health-admin-dashboard/package-lock.json
+          cache-dependency-path: health-admin-dashboard/package-lock.json
 
-      - name: Install deps (Admin Dashboard)
+      - name: Install dependencies
         working-directory: health-admin-dashboard
         run: npm ci
 
-      - name: Build (Admin Dashboard)
+      - name: Build Admin Dashboard
         working-directory: health-admin-dashboard
         run: npm run build
 
@@ -117,6 +118,5 @@ jobs:
           projectId: health-centre-automation
           channelId: live
           target: admin
-          entryPoint: .
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
