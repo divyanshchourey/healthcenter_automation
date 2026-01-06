@@ -84,7 +84,7 @@ const Contact = ({ data }) => {
                 </div>
               </div>
 
-               
+
 
               <div>
                 <label
@@ -115,7 +115,7 @@ const Contact = ({ data }) => {
           <div className="space-y-8">
             <div>
               <h3 className="text-2xl font-semibold text-white mb-6">
-                Why Choose Health Automation?
+                Why Choose Health Center Automation?
               </h3>
               <ul className="space-y-4">
                 <li className="flex items-start">
@@ -190,7 +190,7 @@ const Contact = ({ data }) => {
                 Ready to Get Started?
               </h4>
               <p className="text-gray-300 mb-4">
-                Schedule a personalized demo to see how Health Automation can
+                Schedule a personalized demo to see how Health Center Automation can
                 transform your healthcare operations.
               </p>
               <div className="space-y-2 text-sm text-gray-400">

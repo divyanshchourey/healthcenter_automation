@@ -1,6 +1,6 @@
-# Health Automation Landing Page
+# Health Center Automation Landing Page
 
-A professional, modern, and fully responsive landing page for the Health Automation project built with React JSX and Tailwind CSS.
+A professional, modern, and fully responsive landing page for the Health Center Automation project built with React JSX and Tailwind CSS.
 
 ## Features
 
@@ -140,7 +140,7 @@ The design uses Tailwind's default breakpoints:
 
 ## License
 
-This project is proprietary software for Health Automation.
+This project is proprietary software for Health Center Automation.
 
 ## Support
 

@@ -15,7 +15,6 @@ const CTA = ({ data }) => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-             
             <button className="btn-secondary text-lg sm:text-xl px-10 py-4 sm:px-12 sm:py-5 bg-white text-gray-900 hover:bg-gray-100">
               {data.secondaryCtaText}
             </button>

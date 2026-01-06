@@ -8,8 +8,8 @@ const Hero = ({ data }) => {
   const handleVideoLoad = () => {
     setIsVideoLoaded(true);
   };
-  
-  const navigate = useNavigate() ;
+
+  const navigate = useNavigate();
 
 
 
@@ -25,7 +25,7 @@ const Hero = ({ data }) => {
         <iframe
           ref={videoRef}
           src={data.videoUrl}
-          title="Health Automation Video"
+          title="Health Center Automation Video"
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture; muted"
           allowFullScreen
@@ -51,15 +51,18 @@ const Hero = ({ data }) => {
           {data.subtitle}
         </p>
 
-        
-  
 
-      <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-          <a href="/login/index.html" className="bg-white  text-lg sm:text-xl px-10 py-4 sm:px-12 sm:py-5 rounded-2xl">
+
+
+        <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+          <button
+            onClick={() => navigate("/role-selection")}
+            className="bg-white text-lg sm:text-xl px-10 py-4 sm:px-12 sm:py-5 rounded-2xl hover:bg-gray-100 transition-colors duration-200"
+          >
             {data.ctaText}
-          </a>
+          </button>
         </div>
-      
+
 
         {/* Scroll Indicator */}
       </div>

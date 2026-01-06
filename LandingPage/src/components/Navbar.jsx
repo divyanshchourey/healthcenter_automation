@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Handle scroll effect
   useEffect(() => {
@@ -30,9 +32,8 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-lg" : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg" : "bg-transparent"
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
@@ -45,7 +46,7 @@ const Navbar = () => {
                 color: isScrolled ? "#111827" : "#ffffff",
               }}
             >
-              Health Automation
+              Health Center Automation
             </button>
           </div>
 
@@ -54,36 +55,43 @@ const Navbar = () => {
             <div className="ml-10 flex items-baseline space-x-8">
               <button
                 onClick={() => scrollToSection("hero")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isScrolled
-                    ? "text-gray-700 hover:text-gray-900"
-                    : "text-gray-200 hover:text-white"
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isScrolled
+                  ? "text-gray-700 hover:text-gray-900"
+                  : "text-gray-200 hover:text-white"
+                  }`}
               >
                 Home
               </button>
-              
+
               <button
                 onClick={() => scrollToSection("testimonials")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isScrolled
-                    ? "text-gray-700 hover:text-gray-900"
-                    : "text-gray-200 hover:text-white"
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isScrolled
+                  ? "text-gray-700 hover:text-gray-900"
+                  : "text-gray-200 hover:text-white"
+                  }`}
               >
                 Testimonials
               </button>
               <button
                 onClick={() => scrollToSection("contact")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isScrolled
-                    ? "text-gray-700 hover:text-gray-900"
-                    : "text-gray-200 hover:text-white"
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isScrolled
+                  ? "text-gray-700 hover:text-gray-900"
+                  : "text-gray-200 hover:text-white"
+                  }`}
               >
                 Contact
               </button>
-              
+
+              <button
+                onClick={() => navigate("/role-selection")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isScrolled
+                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg"
+                  : "bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl"
+                  }`}
+              >
+                Get Started
+              </button>
+
             </div>
           </div>
 
@@ -91,11 +99,10 @@ const Navbar = () => {
           <div className="lg:hidden">
             <button
               onClick={toggleMobileMenu}
-              className={`inline-flex items-center justify-center p-2 rounded-md transition-colors duration-200 ${
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
-              }`}
+              className={`inline-flex items-center justify-center p-2 rounded-md transition-colors duration-200 ${isScrolled
+                ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
+                }`}
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
@@ -141,42 +148,51 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="lg:hidden">
           <div
-            className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 transition-all duration-300 ${
-              isScrolled ? "bg-white shadow-lg" : "bg-black bg-opacity-90"
-            }`}
+            className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg" : "bg-black bg-opacity-90"
+              }`}
           >
             <button
               onClick={() => scrollToSection("hero")}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
-              }`}
+              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${isScrolled
+                ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
+                }`}
             >
               Home
             </button>
-             
+
             <button
               onClick={() => scrollToSection("testimonials")}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
-              }`}
+              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${isScrolled
+                ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
+                }`}
             >
               Testimonials
             </button>
             <button
               onClick={() => scrollToSection("contact")}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                  : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
-              }`}
+              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors duration-200 ${isScrolled
+                ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                : "text-gray-200 hover:text-white hover:bg-white hover:bg-opacity-10"
+                }`}
             >
               Contact
             </button>
-             
+
+            <button
+              onClick={() => {
+                navigate("/role-selection");
+                setIsMobileMenuOpen(false);
+              }}
+              className={`block px-3 py-2 rounded-lg text-base font-medium w-full text-center mt-2 transition-all duration-200 ${isScrolled
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-white text-blue-600 hover:bg-blue-50"
+                }`}
+            >
+              Get Started
+            </button>
+
           </div>
         </div>
       )}

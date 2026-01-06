@@ -1,6 +1,6 @@
 {
   "hero": {
-    "title": "Health Automation",
+    "title": "Health Center Automation",
     "subtitle": "Streamline healthcare operations with intelligent automation solutions that enhance patient care and operational efficiency",
     "videoUrl": "https://player.cloudinary.com/embed/?cloud_name=dwemivxbp&public_id=healthCare_wztokf&profile=cld-default&autoplay=true&muted=true&loop=true&fit=cover&crop=fill&width=1920&height=1080",
     "ctaText": "Get Started"
@@ -33,7 +33,7 @@
   },
   "howItWorks": {
     "title": "How It Works",
-    "subtitle": "Get started with Health Automation in just 4 simple steps",
+    "subtitle": "Get started with Health Center Automation in just 4 simple steps",
     "steps": [
       {
         "step": "1",
@@ -62,7 +62,7 @@
     ]
   },
   "benefits": {
-    "title": "Why Choose Health Automation",
+    "title": "Why Choose Health Center Automation",
     "subtitle": "Experience the future of personalized healthcare",
     "items": [
       {
@@ -89,33 +89,162 @@
   },
   "testimonials": {
     "title": "What Our Users Say",
-    "subtitle": "Join thousands of users who have transformed their health journey",
+    "subtitle": "Trusted by users across India for smarter healthcare management",
     "items": [
       {
-        "quote": "Health Automation has completely changed how I manage my health. The AI recommendations are spot-on!",
-        "author": "Sarah Johnson",
-        "position": "Fitness Enthusiast",
+        "quote": "This platform has made managing my health records and appointments extremely easy. The smart suggestions are very helpful.",
+        "author": "Ananya Sharma",
+        "position": "IT Professional, Bengaluru",
         "image": "user1"
       },
       {
-        "quote": "The medication reminders and sleep tracking features have been life-changing for my daily routine.",
-        "author": "Michael Chen",
-        "position": "Health Conscious Professional",
+        "quote": "Medication reminders and health tracking have helped me stay consistent with my routine, even with a busy schedule.",
+        "author": "Rohit Verma",
+        "position": "Working Professional, Delhi",
         "image": "user2"
       },
       {
-        "quote": "Finally, a health app that actually understands my needs and provides personalized guidance.",
-        "author": "Emily Rodriguez",
-        "position": "Wellness Coach",
+        "quote": "As someone focused on wellness, I really appreciate how simple and personalised the guidance feels.",
+        "author": "Priya Iyer",
+        "position": "Yoga & Wellness Instructor, Chennai",
         "image": "user3"
       }
     ]
   },
-  "cta": {
-    "title": "Start Automating Your Health Today",
-    "subtitle": "Join thousands of users who have transformed their health journey with our intelligent automation platform",
-    "ctaText": "Get Started Free",
-    "secondaryCtaText": "Download App"
+  "platformFeatures": {
+    "title": "Platform Features",
+    "subtitle": "Everything you need to manage your health center efficiently",
+    "sections": [
+      {
+        "title": "A Friendly First Experience",
+        "items": [
+          {
+            "title": "Engaging Homepage Experience",
+            "description": "A clean, modern interface with a welcoming background video that makes the platform easy to understand from the first visit."
+          },
+          {
+            "title": "Real Patient Stories",
+            "description": "Honest testimonials from users across India who trust the platform for their healthcare needs."
+          },
+          {
+            "title": "Easy Contact & Support",
+            "description": "Quick “Get in Touch” form with visible phone number and email for any help or queries."
+          }
+        ]
+      },
+      {
+        "title": "Easy & Secure Patient Login",
+        "items": [
+          {
+            "title": "Dedicated Patient Login",
+            "description": "Access your health information securely with your own login."
+          },
+          {
+            "title": "Privacy First",
+            "description": "Your medical data and personal details are protected at all times."
+          }
+        ]
+      },
+      {
+        "title": "Your Personal Health Dashboard",
+        "items": [
+          {
+            "title": "Manage Your Profile",
+            "description": "View and update your personal and contact details anytime."
+          },
+          {
+            "title": "All Health Information in One Place",
+            "description": "No more carrying files—everything is available digitally."
+          }
+        ]
+      },
+      {
+        "title": "Hassle-Free Appointments",
+        "items": [
+          {
+            "title": "Book Appointments Easily",
+            "description": "Choose a doctor and book appointments based on real-time availability."
+          },
+          {
+            "title": "Cancel or Reschedule Anytime",
+            "description": "Manage your appointments with just a few clicks."
+          },
+          {
+            "title": "Calendar Integration",
+            "description": "View appointments clearly with date and time details."
+          }
+        ]
+      },
+      {
+        "title": "Find the Right Doctor",
+        "items": [
+          {
+            "title": "Search by Specialization",
+            "description": "Easily find doctors based on your health needs."
+          },
+          {
+            "title": "Smart Filters",
+            "description": "Filter doctors by availability and consultation type."
+          }
+        ]
+      },
+      {
+        "title": "Choose How You Consult",
+        "items": [
+          {
+            "title": "Visit in Person",
+            "description": "Visit the health center in person for physical examinations."
+          },
+          {
+            "title": "Consult Online",
+            "description": "Consult online through video meetings from the comfort of your home."
+          }
+        ]
+      },
+      {
+        "title": "Access Your Medical Records",
+        "items": [
+          {
+            "title": "View Test Reports & Prescriptions",
+            "description": "Access lab results, medical reports, and doctor notes anytime."
+          },
+          {
+            "title": "Track Your Health History",
+            "description": "Keep a complete digital record of your health journey."
+          }
+        ]
+      },
+      {
+        "title": "Never Miss an Appointment",
+        "items": [
+          {
+            "title": "Automated Reminders",
+            "description": "Receive SMS and email reminders for appointments and follow-ups."
+          },
+          {
+            "title": "Stay on Track",
+            "description": "Helps you maintain regular checkups and treatment schedules."
+          }
+        ]
+      },
+      {
+        "title": "Built for Your Convenience",
+        "items": [
+          {
+            "title": "Saves Time",
+            "description": "Saves time and reduces waiting."
+          },
+          {
+            "title": "User-Friendly Design",
+            "description": "Simple and user-friendly design suitable for all age groups."
+          },
+          {
+            "title": "Indian Healthcare Needs",
+            "description": "Designed specifically for Indian healthcare needs."
+          }
+        ]
+      }
+    ]
   },
   "contact": {
     "title": "Get Started Today",
@@ -123,7 +252,7 @@
     "ctaText": "Schedule Demo"
   },
   "footer": {
-    "companyName": "Health Automation",
+    "companyName": "Health Center Automation",
     "description": "Intelligent healthcare solutions that enhance patient care and operational efficiency",
     "links": {
       "about": "About Us",
@@ -139,7 +268,7 @@
     },
     "newsletter": {
       "title": "Stay Updated",
-      "subtitle": "Get the latest health automation tips and updates delivered to your inbox",
+      "subtitle": "Get the latest health center automation tips and updates delivered to your inbox",
       "placeholder": "Enter your email address",
       "buttonText": "Subscribe"
     }

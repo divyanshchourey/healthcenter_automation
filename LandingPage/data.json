@@ -1,6 +1,6 @@
 {
   "hero": {
-    "title": "Health Automation",
+    "title": "Health Center Automation",
     "subtitle": "Streamline healthcare operations with intelligent automation solutions that enhance patient care and operational efficiency",
     "videoUrl": "https://player.cloudinary.com/embed/?cloud_name=dwemivxbp&public_id=healthCare_wztokf&profile=cld-default",
     "ctaText": "Learn More"
@@ -28,7 +28,7 @@
     "subtitle": "Trusted by healthcare professionals worldwide",
     "items": [
       {
-        "quote": "Health Automation has revolutionized our patient care workflow, saving us hours of administrative work daily.",
+        "quote": "Health Center Automation has revolutionized our patient care workflow, saving us hours of administrative work daily.",
         "author": "Dr. Sarah Johnson",
         "position": "Chief Medical Officer, City General Hospital"
       },
