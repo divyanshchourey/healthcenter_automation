@@ -1,0 +1,47 @@
+{
+  "hero": {
+    "title": "Health Center Automation",
+    "subtitle": "Streamline healthcare operations with intelligent automation solutions that enhance patient care and operational efficiency",
+    "videoUrl": "https://player.cloudinary.com/embed/?cloud_name=dwemivxbp&public_id=healthCare_wztokf&profile=cld-default",
+    "ctaText": "Learn More"
+  },
+  "features": {
+    "title": "Key Features",
+    "subtitle": "Discover how our automation solutions transform healthcare workflows",
+    "items": [
+      {
+        "title": "Patient Management",
+        "description": "Automated patient scheduling, records management, and care coordination"
+      },
+      {
+        "title": "Workflow Optimization",
+        "description": "Streamline administrative tasks and reduce manual processing time"
+      },
+      {
+        "title": "Data Integration",
+        "description": "Seamless integration with existing healthcare systems and databases"
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "What Our Clients Say",
+    "subtitle": "Trusted by healthcare professionals worldwide",
+    "items": [
+      {
+        "quote": "Health Center Automation has revolutionized our patient care workflow, saving us hours of administrative work daily.",
+        "author": "Dr. Sarah Johnson",
+        "position": "Chief Medical Officer, City General Hospital"
+      },
+      {
+        "quote": "The integration was seamless and the results exceeded our expectations. Highly recommended.",
+        "author": "Michael Chen",
+        "position": "IT Director, Regional Medical Center"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Get Started Today",
+    "subtitle": "Ready to transform your healthcare operations? Contact us for a personalized demo.",
+    "ctaText": "Schedule Demo"
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "hero": {
+    "title": "Health Center Automation",
+    "subtitle": "Streamline healthcare operations with intelligent automation solutions that enhance patient care and operational efficiency",
+    "videoUrl": "https://player.cloudinary.com/embed/?cloud_name=dwemivxbp&public_id=healthCare_wztokf&profile=cld-default&autoplay=true&muted=true&loop=true&fit=cover&crop=fill&width=1920&height=1080",
+    "ctaText": "Get Started"
+  },
+  "features": {
+    "title": "Key Features",
+    "subtitle": "Discover how our automation solutions transform healthcare workflows",
+    "items": [
+      {
+        "title": "Activity & Sleep Tracking",
+        "description": "Monitor your daily activities and sleep patterns with advanced sensors and AI analysis",
+        "icon": "activity"
+      },
+      {
+        "title": "Diet & Nutrition Guidance",
+        "description": "Get personalized nutrition recommendations and meal planning based on your health goals",
+        "icon": "nutrition"
+      },
+      {
+        "title": "AI Health Recommendations",
+        "description": "Receive intelligent health insights and recommendations powered by machine learning",
+        "icon": "ai"
+      },
+      {
+        "title": "Medication Reminders",
+        "description": "Never miss a dose with smart medication reminders and tracking system",
+        "icon": "medication"
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Get started with Health Center Automation in just 4 simple steps",
+    "steps": [
+      {
+        "step": "1",
+        "title": "Sign Up",
+        "description": "Create your account and complete your health profile in minutes",
+        "icon": "signup"
+      },
+      {
+        "step": "2",
+        "title": "Track Your Health",
+        "description": "Start monitoring your daily activities, sleep, and nutrition automatically",
+        "icon": "track"
+      },
+      {
+        "step": "3",
+        "title": "Get Insights",
+        "description": "Receive personalized health insights and recommendations from our AI",
+        "icon": "insights"
+      },
+      {
+        "step": "4",
+        "title": "Improve Your Lifestyle",
+        "description": "Make informed decisions and improve your health with data-driven guidance",
+        "icon": "improve"
+      }
+    ]
+  },
+  "benefits": {
+    "title": "Why Choose Health Center Automation",
+    "subtitle": "Experience the future of personalized healthcare",
+    "items": [
+      {
+        "title": "Automated Smart Insights",
+        "description": "Get intelligent health recommendations without manual tracking",
+        "icon": "automation"
+      },
+      {
+        "title": "Easy-to-Use Interface",
+        "description": "Intuitive design that makes health management simple and enjoyable",
+        "icon": "interface"
+      },
+      {
+        "title": "Works on Any Device",
+        "description": "Access your health data anywhere, anytime across all your devices",
+        "icon": "devices"
+      },
+      {
+        "title": "Personalized Reminders",
+        "description": "Customized notifications and reminders tailored to your lifestyle",
+        "icon": "reminders"
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "What Our Users Say",
+    "subtitle": "Trusted by users across India for smarter healthcare management",
+    "items": [
+      {
+        "quote": "This platform has made managing my health records and appointments extremely easy. The smart suggestions are very helpful.",
+        "author": "Ananya Sharma",
+        "position": "IT Professional, Bengaluru",
+        "image": "user1"
+      },
+      {
+        "quote": "Medication reminders and health tracking have helped me stay consistent with my routine, even with a busy schedule.",
+        "author": "Rohit Verma",
+        "position": "Working Professional, Delhi",
+        "image": "user2"
+      },
+      {
+        "quote": "As someone focused on wellness, I really appreciate how simple and personalised the guidance feels.",
+        "author": "Priya Iyer",
+        "position": "Yoga & Wellness Instructor, Chennai",
+        "image": "user3"
+      }
+    ]
+  },
+  "platformFeatures": {
+    "title": "Platform Features",
+    "subtitle": "Everything you need to manage your health center efficiently",
+    "sections": [
+      {
+        "title": "A Friendly First Experience",
+        "items": [
+          {
+            "title": "Engaging Homepage Experience",
+            "description": "A clean, modern interface with a welcoming background video that makes the platform easy to understand from the first visit."
+          },
+          {
+            "title": "Real Patient Stories",
+            "description": "Honest testimonials from users across India who trust the platform for their healthcare needs."
+          },
+          {
+            "title": "Easy Contact & Support",
+            "description": "Quick “Get in Touch” form with visible phone number and email for any help or queries."
+          }
+        ]
+      },
+      {
+        "title": "Easy & Secure Patient Login",
+        "items": [
+          {
+            "title": "Dedicated Patient Login",
+            "description": "Access your health information securely with your own login."
+          },
+          {
+            "title": "Privacy First",
+            "description": "Your medical data and personal details are protected at all times."
+          }
+        ]
+      },
+      {
+        "title": "Your Personal Health Dashboard",
+        "items": [
+          {
+            "title": "Manage Your Profile",
+            "description": "View and update your personal and contact details anytime."
+          },
+          {
+            "title": "All Health Information in One Place",
+            "description": "No more carrying files—everything is available digitally."
+          }
+        ]
+      },
+      {
+        "title": "Hassle-Free Appointments",
+        "items": [
+          {
+            "title": "Book Appointments Easily",
+            "description": "Choose a doctor and book appointments based on real-time availability."
+          },
+          {
+            "title": "Cancel or Reschedule Anytime",
+            "description": "Manage your appointments with just a few clicks."
+          },
+          {
+            "title": "Calendar Integration",
+            "description": "View appointments clearly with date and time details."
+          }
+        ]
+      },
+      {
+        "title": "Find the Right Doctor",
+        "items": [
+          {
+            "title": "Search by Specialization",
+            "description": "Easily find doctors based on your health needs."
+          },
+          {
+            "title": "Smart Filters",
+            "description": "Filter doctors by availability and consultation type."
+          }
+        ]
+      },
+      {
+        "title": "Choose How You Consult",
+        "items": [
+          {
+            "title": "Visit in Person",
+            "description": "Visit the health center in person for physical examinations."
+          },
+          {
+            "title": "Consult Online",
+            "description": "Consult online through video meetings from the comfort of your home."
+          }
+        ]
+      },
+      {
+        "title": "Access Your Medical Records",
+        "items": [
+          {
+            "title": "View Test Reports & Prescriptions",
+            "description": "Access lab results, medical reports, and doctor notes anytime."
+          },
+          {
+            "title": "Track Your Health History",
+            "description": "Keep a complete digital record of your health journey."
+          }
+        ]
+      },
+      {
+        "title": "Never Miss an Appointment",
+        "items": [
+          {
+            "title": "Automated Reminders",
+            "description": "Receive SMS and email reminders for appointments and follow-ups."
+          },
+          {
+            "title": "Stay on Track",
+            "description": "Helps you maintain regular checkups and treatment schedules."
+          }
+        ]
+      },
+      {
+        "title": "Built for Your Convenience",
+        "items": [
+          {
+            "title": "Saves Time",
+            "description": "Saves time and reduces waiting."
+          },
+          {
+            "title": "User-Friendly Design",
+            "description": "Simple and user-friendly design suitable for all age groups."
+          },
+          {
+            "title": "Indian Healthcare Needs",
+            "description": "Designed specifically for Indian healthcare needs."
+          }
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "title": "Get Started Today",
+    "subtitle": "Ready to transform your healthcare operations? Contact us for a personalized demo.",
+    "ctaText": "Schedule Demo"
+  },
+  "footer": {
+    "companyName": "Health Center Automation",
+    "description": "Intelligent healthcare solutions that enhance patient care and operational efficiency",
+    "links": {
+      "about": "About Us",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "socialMedia": {
+      "facebook": "https://facebook.com/healthautomation",
+      "twitter": "https://twitter.com/healthautomation",
+      "linkedin": "https://linkedin.com/company/healthautomation",
+      "instagram": "https://instagram.com/healthautomation"
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "subtitle": "Get the latest health center automation tips and updates delivered to your inbox",
+      "placeholder": "Enter your email address",
+      "buttonText": "Subscribe"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+name: Deploy LandingPage to Firebase Hosting (login branch)
+
+on:
+  push:
+    branches:
+      - login
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: |
+            LandingPage/package-lock.json
+
+      - name: Install deps (LandingPage)
+        working-directory: LandingPage
+        run: npm ci
+
+      - name: Build (LandingPage)
+        working-directory: LandingPage
+        run: npm run build
+
+      # Option A: Use Service Account JSON (recommended)
+      - name: Deploy to Firebase Hosting (live)
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          channelId: live
+          entryPoint: .
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      # Option B: Use legacy CLI token if provided
+      - name: Deploy with firebase-tools using token (fallback)
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT == '' && secrets.FIREBASE_TOKEN != '' }}
+        run: |
+          npm i -g firebase-tools
+          firebase deploy --only hosting --non-interactive --force
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
