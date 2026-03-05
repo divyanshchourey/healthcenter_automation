@@ -152,6 +152,35 @@ export default function Dashboard({ user, onLogout }) {
     },
   ];
 
+  const labCenters = [
+    {
+      id: "LAB-001",
+      name: "Central Diagnostics Lab",
+      address: "12, MG Road, City Center",
+      contact: "+91 98765 43210",
+      tests: ["CBC", "Lipid Profile", "LFT", "KFT"],
+    },
+    {
+      id: "LAB-002",
+      name: "HealthPlus Lab Centre",
+      address: "2nd Floor, Health Mall, Main Street",
+      contact: "+91 98123 45678",
+      tests: ["MRI Brain", "CT Scan", "X-Ray Chest"],
+    },
+    {
+      id: "LAB-003",
+      name: "City Pathology & Diagnostics",
+      address: "45, Green Park, Near Metro Station",
+      contact: "+91 90000 11111",
+      tests: ["Thyroid Panel", "Vitamin D", "HbA1c"],
+    },
+  ];
+
+  const [selectedLabId, setSelectedLabId] = useState("");
+  const [selectedTestName, setSelectedTestName] = useState("");
+  const [labBookingNote, setLabBookingNote] = useState("");
+  const [labBookingMessage, setLabBookingMessage] = useState("");
+
   const downloadSinglePrescriptionPdf = (prescription) => {
     const doc = new jsPDF();
     let y = 20;
@@ -494,6 +523,7 @@ export default function Dashboard({ user, onLogout }) {
     { id: "Appointment", label: "Appointment", icon: Calendar },
     { id: "Records", label: "Records", icon: FileText },
     { id: "Billing", label: "Billing", icon: CreditCard },
+    { id: "LabCenters", label: "Lab Centers", icon: FileText },
     { id: "Prescription", label: "Prescription & Tests", icon: ClipboardList },
   ];
 
@@ -887,7 +917,7 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Appointment Section */}
         {activeMenu === "Appointment" && (
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-full mx-auto">
             <Appointment user={user} />
           </div>
         )}
@@ -1130,6 +1160,168 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Lab Centers Section */}
+        {activeMenu === "LabCenters" && (
+          <div className="max-w-5xl mx-auto space-y-6">
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-2xl font-bold mb-2 text-blue-700">
+                Lab Centers
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Browse available lab centers, see their common tests, and place a mock test
+                booking request based on your needs.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              {labCenters.map((lab) => (
+                <div
+                  key={lab.id}
+                  className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-between"
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {lab.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">{lab.address}</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Contact: <span className="font-medium">{lab.contact}</span>
+                    </p>
+                    <div className="mt-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-1">
+                        Popular Tests
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {lab.tests.map((test) => (
+                          <button
+                            key={test}
+                            type="button"
+                            onClick={() => {
+                              setSelectedLabId(lab.id);
+                              setSelectedTestName(test);
+                            }}
+                            className={`px-3 py-1 rounded-full text-xs border ${
+                              selectedLabId === lab.id &&
+                              selectedTestName === test
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                            }`}
+                          >
+                            {test}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedLabId(lab.id);
+                        if (!selectedTestName && lab.tests.length > 0) {
+                          setSelectedTestName(lab.tests[0]);
+                        }
+                      }}
+                      className="w-full mt-1 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
+                    >
+                      Choose this Lab
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md p-6 space-y-4">
+              <h3 className="text-xl font-semibold text-blue-700">
+                Book a Lab Test (Mock)
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Selected Lab
+                  </label>
+                  <select
+                    value={selectedLabId}
+                    onChange={(e) => {
+                      setSelectedLabId(e.target.value);
+                      setSelectedTestName("");
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select lab center</option>
+                    {labCenters.map((lab) => (
+                      <option key={lab.id} value={lab.id}>
+                        {lab.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Test Name
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedTestName}
+                    onChange={(e) => setSelectedTestName(e.target.value)}
+                    placeholder="e.g., CBC, MRI Brain"
+                    className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notes (optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={labBookingNote}
+                  onChange={(e) => setLabBookingNote(e.target.value)}
+                  placeholder="Add any special instructions, preferred time slot, or clinical notes."
+                  className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedLabId("");
+                    setSelectedTestName("");
+                    setLabBookingNote("");
+                    setLabBookingMessage("");
+                  }}
+                  className="border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium py-2 px-6 rounded-lg transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!selectedLabId || !selectedTestName) {
+                      alert("Please select a lab and test name.");
+                      return;
+                    }
+                    const lab = labCenters.find((l) => l.id === selectedLabId);
+                    setLabBookingMessage(
+                      `Your mock request for "${selectedTestName}" at "${
+                        lab?.name || ""
+                      }" has been recorded. The lab will contact you for confirmation.`
+                    );
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                >
+                  Book Test (Mock)
+                </button>
+              </div>
+              {labBookingMessage && (
+                <p className="text-sm text-green-700 font-medium text-right">
+                  {labBookingMessage}
+                </p>
+              )}
             </div>
           </div>
         )}
