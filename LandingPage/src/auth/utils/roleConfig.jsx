@@ -9,7 +9,7 @@ export const getRoleConfig = (role) => {
       registerTitle: 'Doctor Registration',
       registerSubtitle: 'Create your medical practice account',
       dashboardTitle: 'Doctor Dashboard',
-      icon: <User className="w-6 h-6"/>,
+      icon: <User className="w-6 h-6" />,
       color: 'from-blue-500 to-blue-600',
       extraFields: ['specialization', 'licenseNumber']
     },
@@ -41,6 +41,16 @@ export const getRoleConfig = (role) => {
       dashboardTitle: 'Admin Dashboard',
       icon: <Shield className="w-6 h-6" />,
       color: 'from-red-500 to-red-600',
+      extraFields: []
+    },
+    labcenter: {
+      title: 'Lab Center Login',
+      subtitle: 'Access laboratory management dashboard',
+      registerTitle: 'Lab Center Registration',
+      registerSubtitle: 'Create your laboratory account',
+      dashboardTitle: 'Lab Center Dashboard',
+      icon: <Shield className="w-6 h-6" />,
+      color: 'from-blue-600 to-blue-800',
       extraFields: []
     }
   };

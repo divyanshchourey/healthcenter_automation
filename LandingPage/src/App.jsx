@@ -93,6 +93,8 @@ const AppContent = () => {
       navigate('/staff/dashboard');
     } else if (user.role === 'admin' || user.roleId === 1) {
       navigate('/admin/dashboard');
+    } else if (user.role === 'labcenter' || user.roleId === 5) {
+      navigate('/dashboard');
     } else {
       navigate('/dashboard');
     }
@@ -154,6 +156,20 @@ const AppContent = () => {
               role="admin"
               onBack={() => navigate('/role-selection')}
               onRegister={() => { }} // Admin doesn't have registration
+              onLogin={handleLoginSuccess}
+            />
+          )
+        } />
+
+        {/* Lab Center Login Route - Direct access */}
+        <Route path="/login/labcenter" element={
+          isLoggedIn && (currentUser?.role === 'labcenter' || currentUser?.roleId === 5) ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <LoginPage
+              role="labcenter"
+              onBack={() => navigate('/role-selection')}
+              onRegister={() => { }} // Lab center doesn't have registration
               onLogin={handleLoginSuccess}
             />
           )
