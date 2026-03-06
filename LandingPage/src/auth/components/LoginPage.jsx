@@ -142,6 +142,19 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
         } else {
           throw new Error('Invalid admin credentials. Please check your email and password.');
         }
+      } else if (role === 'labcenter') {
+        // Lab Center login with hardcoded credentials
+        if (formData.email === 'labcenter@gmail.com' && formData.password === 'lab1234') {
+          onLogin({
+            email: formData.email,
+            role: 'labcenter',
+            name: 'Lab Center User',
+            userId: 501, // Mock user ID
+            roleId: 5,
+          });
+        } else {
+          throw new Error('Invalid Lab Center credentials. Please check your email and password.');
+        }
       } else {
         // For other roles, keep placeholder until specific endpoints are implemented
         onLogin({

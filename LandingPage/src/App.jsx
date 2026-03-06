@@ -19,6 +19,11 @@ import PatientDashboardWrapper from "./auth/components/PatientDashboardWrapper.j
 import DoctorDashboardWrapper from "./auth/components/DoctorDashboardWrapper.jsx";
 import StaffDashboardWrapper from "./auth/components/StaffDashboardWrapper.jsx";
 import AdminDashboardWrapper from "./auth/components/AdminDashboardWrapper.jsx";
+import LabCenterDashboardWrapper from "./auth/components/LabCenterDashboardWrapper.jsx";
+
+// Lab Center Dashboard Pages
+import LabCenterProfile from "./auth/lab-center-dashboard/pages/Profile.jsx";
+import LabCenterTests from "./auth/lab-center-dashboard/pages/TestsBooked.jsx";
 
 // Admin Dashboard Pages
 import AdminHome from "./auth/admin-dashboard/pages/Dashboard.jsx";
@@ -96,6 +101,8 @@ const AppContent = () => {
       navigate('/staff/dashboard');
     } else if (user.role === 'admin' || user.roleId === 1) {
       navigate('/admin/dashboard');
+    } else if (user.role === 'labcenter' || user.roleId === 5) {
+      navigate('/lab-center/dashboard');
     } else {
       navigate('/dashboard');
     }
@@ -129,7 +136,7 @@ const AppContent = () => {
   };
 
   // Check if we're showing a dashboard (no gradient background needed)
-  const isDashboard = ['/dashboard', '/patient/dashboard', '/doctor/dashboard', '/staff/dashboard', '/admin/dashboard'].includes(location.pathname);
+  const isDashboard = ['/dashboard', '/patient/dashboard', '/doctor/dashboard', '/staff/dashboard', '/admin/dashboard', '/lab-center/dashboard', '/lab-center/dashboard/tests'].includes(location.pathname);
 
   return (
     <div className={isDashboard ? "min-h-screen bg-white" : "min-h-screen bg-white"}>
@@ -162,6 +169,20 @@ const AppContent = () => {
           )
         } />
 
+        {/* Lab Center Login Route - Direct access */}
+        <Route path="/login/labcenter" element={
+          isLoggedIn && (currentUser?.role === 'labcenter' || currentUser?.roleId === 5) ? (
+            <Navigate to="/lab-center/dashboard" replace />
+          ) : (
+            <LoginPage
+              role="labcenter"
+              onBack={() => navigate('/role-selection')}
+              onRegister={() => { }} // Lab centers currently don't have self-registration
+              onLogin={handleLoginSuccess}
+            />
+          )
+        } />
+
         {/* General Login Route */}
         <Route path="/login" element={
           isLoggedIn ? (
@@ -173,7 +194,9 @@ const AppContent = () => {
                   <Navigate to="/staff/dashboard" replace /> :
                   currentUser?.role === 'admin' || currentUser?.roleId === 1 ?
                     <Navigate to="/admin/dashboard" replace /> :
-                    <Navigate to="/dashboard" replace />
+                    currentUser?.role === 'labcenter' || currentUser?.roleId === 5 ?
+                      <Navigate to="/lab-center/dashboard" replace /> :
+                      <Navigate to="/dashboard" replace />
           ) :
             location.state?.role ? (
               <LoginPage
@@ -369,6 +392,23 @@ const AppContent = () => {
             <AdminDashboardWrapper user={currentUser} onLogout={handleLogout}>
               <LabCenterForm />
             </AdminDashboardWrapper>
+          </ProtectedRoute>
+        } />
+
+        {/* Lab Center Dashboard Routes */}
+        <Route path="/lab-center/dashboard" element={
+          <ProtectedRoute requiredRole="labcenter">
+            <LabCenterDashboardWrapper user={currentUser} onLogout={handleLogout}>
+              <LabCenterProfile />
+            </LabCenterDashboardWrapper>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/lab-center/dashboard/tests" element={
+          <ProtectedRoute requiredRole="labcenter">
+            <LabCenterDashboardWrapper user={currentUser} onLogout={handleLogout}>
+              <LabCenterTests />
+            </LabCenterDashboardWrapper>
           </ProtectedRoute>
         } />
 
