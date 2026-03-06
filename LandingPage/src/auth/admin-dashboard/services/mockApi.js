@@ -10,13 +10,13 @@ export function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export async function sendOtp(mobile){
+export async function sendOtp(mobile) {
   await delay(600)
   const otp = '123456'
   return { success: /^\d{10}$/.test(mobile), otp }
 }
 
-export async function verifyOtp(mobile, otp, remember){
+export async function verifyOtp(mobile, otp, remember) {
   await delay(600)
   if (/^\d{10}$/.test(mobile) && otp === '123456') {
     const user = { id: 'u1', name: 'Admin', mobile, role: 'admin' }
@@ -26,7 +26,7 @@ export async function verifyOtp(mobile, otp, remember){
   return null
 }
 
-export async function forgotPasswordQuestions(mobile){
+export async function forgotPasswordQuestions(mobile) {
   await delay(400)
   return [
     'What is your favorite color?',
@@ -34,22 +34,22 @@ export async function forgotPasswordQuestions(mobile){
   ]
 }
 
-export async function verifySecurityAnswers(mobile, answers){
+export async function verifySecurityAnswers(mobile, answers) {
   await delay(500)
   return answers.every((a) => a && a.length >= 3)
 }
 
-export async function fetchStats(){
+export async function fetchStats() {
   await delay(300)
   return { patients: 1240, appointments: 320, tests: 890, revenue: 125000 }
 }
 
-export async function fetchAppointmentTrends(){
+export async function fetchAppointmentTrends() {
   await delay(300)
-  return Array.from({ length: 10 }).map((_, i) => ({ date: `2025-08-${String(10 + i).padStart(2,'0')}`, count: 20 + Math.round(Math.random()*30) }))
+  return Array.from({ length: 10 }).map((_, i) => ({ date: `2025-08-${String(10 + i).padStart(2, '0')}`, count: 20 + Math.round(Math.random() * 30) }))
 }
 
-export async function fetchTestDistribution(){
+export async function fetchTestDistribution() {
   await delay(300)
   return [
     { type: 'Blood', value: 40 },
@@ -59,13 +59,13 @@ export async function fetchTestDistribution(){
   ]
 }
 
-export async function fetchRecentActivity(page = 1, pageSize = 5){
+export async function fetchRecentActivity(page = 1, pageSize = 5) {
   await delay(400)
   const total = 18
   const items = Array.from({ length: pageSize }).map((_, i) => ({
-    id: `a${(page-1)*pageSize + i + 1}`,
-    time: new Date(Date.now() - (i + page*2) * 3600000).toISOString(),
-    message: `Activity ${(page-1)*pageSize + i + 1}: Appointment updated`
+    id: `a${(page - 1) * pageSize + i + 1}`,
+    time: new Date(Date.now() - (i + page * 2) * 3600000).toISOString(),
+    message: `Activity ${(page - 1) * pageSize + i + 1}: Appointment updated`
   }))
   return { items, total }
 }
@@ -333,6 +333,180 @@ export async function saveStaff(input) {
   staff.push(created)
   persistStaff(staff)
   return created
+}
+
+// Lab Centers mock
+const LAB_CENTER_STORAGE_KEY = 'health_admin_lab_centers_v1'
+
+export const defaultLabCenters = [
+  {
+    id: 'l1',
+    name: 'City Lab Center',
+    address: '123 Health St, Mumbai',
+    contact: '9876543210',
+    accreditationNumber: 'ACC123456',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l2',
+    name: 'Elite Diagnostics',
+    address: '456 Wellness Rd, Pune',
+    contact: '9123456789',
+    accreditationNumber: 'ACC789012',
+    approvedByAdmin: false,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l3',
+    name: 'Apex Clinical Labs',
+    address: 'Block B, Connaught Place, New Delhi',
+    contact: '9988776655',
+    accreditationNumber: 'ACC456123',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l4',
+    name: 'Quality Care Diagnostics',
+    address: '7th Main Road, Indiranagar, Bangalore',
+    contact: '9123456780',
+    accreditationNumber: 'ACC321654',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l5',
+    name: 'Metro Health Scans',
+    address: 'Banjara Hills Road No. 1, Hyderabad',
+    contact: '9000011122',
+    accreditationNumber: 'ACC987321',
+    approvedByAdmin: false,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l6',
+    name: 'Sunrise Pathology',
+    address: 'Anna Salai, Teynampet, Chennai',
+    contact: '9840123456',
+    accreditationNumber: 'ACC654987',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l7',
+    name: 'Global Research Center',
+    address: 'Salt Lake Sector V, Kolkata',
+    contact: '9748000000',
+    accreditationNumber: 'ACC159753',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l8',
+    name: 'Modern Diagnostic Clinic',
+    address: 'M.G. Road, Sector 14, Gurgaon',
+    contact: '9910022334',
+    accreditationNumber: 'ACC246810',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l9',
+    name: 'HealthPlus Laboratory',
+    address: 'Lalbagh Road, Bangalore',
+    contact: '9880011223',
+    accreditationNumber: 'ACC135791',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l10',
+    name: 'Reliable Scan Center',
+    address: 'Civil Lines, Nagpur',
+    contact: '9422110055',
+    accreditationNumber: 'ACC369258',
+    approvedByAdmin: false,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l11',
+    name: 'Prime Healthcare Labs',
+    address: 'Vasant Kunj, South Delhi',
+    contact: '9810055443',
+    accreditationNumber: 'ACC147258',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'l12',
+    name: 'Fast-Track Diagnostics',
+    address: 'Gomti Nagar, Lucknow',
+    contact: '9956012345',
+    accreditationNumber: 'ACC963852',
+    approvedByAdmin: true,
+    createdAt: new Date().toISOString()
+  }
+]
+
+function loadLabCenters() {
+  if (!isBrowser()) return [...defaultLabCenters]
+  const raw = window.localStorage.getItem(LAB_CENTER_STORAGE_KEY)
+  if (!raw) {
+    window.localStorage.setItem(LAB_CENTER_STORAGE_KEY, JSON.stringify(defaultLabCenters))
+    return [...defaultLabCenters]
+  }
+  try {
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) {
+      return parsed
+    }
+  } catch (error) {
+    console.warn('Failed to parse stored lab centers. Restoring defaults.', error)
+  }
+  window.localStorage.setItem(LAB_CENTER_STORAGE_KEY, JSON.stringify(defaultLabCenters))
+  return [...defaultLabCenters]
+}
+
+function persistLabCenters(list) {
+  if (!isBrowser()) return
+  window.localStorage.setItem(LAB_CENTER_STORAGE_KEY, JSON.stringify(list))
+}
+
+let labCenters = loadLabCenters()
+
+export async function fetchLabCenters() {
+  await delay(300)
+  return labCenters
+}
+
+export async function fetchLabCenterById(id) {
+  await delay(200)
+  return labCenters.find((l) => l.id === id) || null
+}
+
+export async function saveLabCenter(input) {
+  await delay(300)
+  if (input.id) {
+    labCenters = labCenters.map((l) => (l.id === input.id ? { ...l, ...input } : l))
+    persistLabCenters(labCenters)
+    return input
+  }
+  const created = {
+    ...input,
+    id: `l${Date.now()}`,
+    createdAt: new Date().toISOString()
+  }
+  labCenters.push(created)
+  persistLabCenters(labCenters)
+  return created
+}
+
+export async function deleteLabCenterMock(id) {
+  await delay(200)
+  labCenters = labCenters.filter((l) => l.id !== id)
+  persistLabCenters(labCenters)
+  return true
 }
 
 

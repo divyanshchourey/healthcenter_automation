@@ -401,3 +401,68 @@ export const deleteAppointment = async (appointmentId) => {
   });
   return handleResponse(response);
 };
+
+import { defaultLabCenters } from '../admin-dashboard/services/mockApi.js';
+
+export const getAllLabCenters = async () => {
+  const url = buildUrl(API_ENDPOINTS.LAB_CENTER_LIST);
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await handleResponse(response);
+
+    // Check if data is empty (Array or {data: []})
+    const items = Array.isArray(data) ? data : (data?.data || []);
+    if (items.length === 0) {
+      console.log('API returned no lab centers, using mock data fallback');
+      return defaultLabCenters;
+    }
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch lab centers, using mock data fallback:', error);
+    return defaultLabCenters;
+  }
+};
+
+export const getLabCenterById = async (id) => {
+  const url = buildUrl(API_ENDPOINTS.GET_LAB_CENTER(id));
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error(`Failed to fetch lab center ${id}, using mock data fallback:`, error);
+    return defaultLabCenters.find(l => l.id === id) || null;
+  }
+};
+
+export const createLabCenter = async (data) => {
+  const url = buildUrl(API_ENDPOINTS.CREATE_LAB_CENTER);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(response);
+};
+
+export const deleteLabCenter = async (id) => {
+  const url = buildUrl(API_ENDPOINTS.DELETE_LAB_CENTER(id));
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return handleResponse(response);
+};

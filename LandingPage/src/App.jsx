@@ -32,6 +32,9 @@ import PatientsList from "./auth/admin-dashboard/pages/patients/PatientsList.jsx
 import PatientForm from "./auth/admin-dashboard/pages/patients/PatientForm.jsx";
 import PatientDetails from "./auth/admin-dashboard/pages/patients/PatientDetails.jsx";
 import AppointmentsList from "./auth/admin-dashboard/pages/appointments/AppointmentsList.jsx";
+import LabCentersList from "./auth/admin-dashboard/pages/lab-centers/LabCentersList.jsx";
+import LabCenterForm from "./auth/admin-dashboard/pages/lab-centers/LabCenterForm.jsx";
+import LabCenterDetails from "./auth/admin-dashboard/pages/lab-centers/LabCenterDetails.jsx";
 
 // Landing Page Content Component
 const LandingPageContent = ({ data }) => {
@@ -333,6 +336,38 @@ const AppContent = () => {
           <ProtectedRoute requiredRole="admin">
             <AdminDashboardWrapper user={currentUser} onLogout={handleLogout}>
               <AppointmentsList />
+            </AdminDashboardWrapper>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/dashboard/lab-centers" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboardWrapper user={currentUser} onLogout={handleLogout}>
+              <LabCentersList />
+            </AdminDashboardWrapper>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/dashboard/lab-centers/new" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboardWrapper user={currentUser} onLogout={handleLogout}>
+              <LabCenterForm />
+            </AdminDashboardWrapper>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/dashboard/lab-centers/:id" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboardWrapper user={currentUser} onLogout={handleLogout}>
+              <LabCenterDetails />
+            </AdminDashboardWrapper>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/dashboard/lab-centers/:id/edit" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboardWrapper user={currentUser} onLogout={handleLogout}>
+              <LabCenterForm />
             </AdminDashboardWrapper>
           </ProtectedRoute>
         } />

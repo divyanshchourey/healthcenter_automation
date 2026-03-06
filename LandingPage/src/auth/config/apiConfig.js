@@ -19,6 +19,10 @@ export const API_ENDPOINTS = {
   GET_DOCTOR_APPOINTMENTS: (userId, date) => `/doctor/${userId}/appointments?date=${date}`,
   GET_EMPLOYEE_APPOINTMENTS: (date) => `/employee/appointments?date=${date}`,
   DELETE_APPOINTMENT: (appointmentId) => `/employee/appointments/${appointmentId}`,
+  LAB_CENTER_LIST: '/lab-centers/',
+  CREATE_LAB_CENTER: '/lab-centers/',
+  GET_LAB_CENTER: (id) => `/lab-centers/${id}`,
+  DELETE_LAB_CENTER: (id) => `/lab-centers/${id}`,
 };
 
 export const PATIENT_ROLE_ID = Number(

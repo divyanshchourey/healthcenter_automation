@@ -8,7 +8,44 @@ export default function Dashboard({ user, onLogout }) {
   const [activeMenu, setActiveMenu] = useState("Profile");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [patientName, setPatientName] = useState(user?.name || "Patient");
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState([
+    {
+      id: "APT-MOCK-001",
+      doctorName: "Dr. Sarah Johnson",
+      specialization: "General Physician",
+      date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      time: "10:30 AM",
+      status: "Confirmed",
+      type: "today"
+    },
+    {
+      id: "APT-MOCK-002",
+      doctorName: "Dr. Michael Chen",
+      specialization: "Cardiologist",
+      date: new Date(Date.now() + 86400000).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      time: "02:00 PM",
+      status: "Confirmed",
+      type: "upcoming"
+    },
+    {
+      id: "APT-MOCK-003",
+      doctorName: "Dr. Emily Brown",
+      specialization: "Dermatologist",
+      date: new Date(Date.now() - 172800000).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      time: "11:15 AM",
+      status: "Completed",
+      type: "previous"
+    },
+    {
+      id: "APT-MOCK-004",
+      doctorName: "Dr. Robert Wilson",
+      specialization: "Neurologist",
+      date: new Date(Date.now() + 259200000).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      time: "09:45 AM",
+      status: "Confirmed",
+      type: "upcoming"
+    }
+  ]);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     email: user?.email || "",
@@ -112,6 +149,28 @@ export default function Dashboard({ user, onLogout }) {
         },
       ],
     },
+    {
+      id: "PR-003",
+      date: "2026-03-01",
+      doctorName: "Dr. Robert Wilson",
+      department: "Neurology",
+      createdBy: "OPD Staff",
+      notes: "Take enough rest and stay hydrated. Follow up after 10 days.",
+      medicines: [
+        {
+          name: "Sumatriptan 50mg",
+          dosage: "1 tablet",
+          frequency: "When needed for migraine",
+          duration: "5 days",
+        },
+        {
+          name: "Magnesium supplement",
+          dosage: "1 tablet",
+          frequency: "Once daily",
+          duration: "30 days",
+        },
+      ],
+    },
   ];
 
   const labReports = [
@@ -130,6 +189,14 @@ export default function Dashboard({ user, onLogout }) {
       date: "2026-02-11",
       status: "Available",
       summary: "Borderline high LDL. Lifestyle changes advised.",
+    },
+    {
+      id: "LR-203",
+      labName: "City Pathology & Diagnostics",
+      testName: "Thyroid Panel",
+      date: "2026-03-02",
+      status: "Available",
+      summary: "TSH levels are slightly high. Consultation with endocrinologist recommended.",
     },
   ];
 
@@ -150,6 +217,26 @@ export default function Dashboard({ user, onLogout }) {
       status: "Available",
       summary: "Lungs clear. No active disease.",
     },
+    {
+      id: "TR-303",
+      testCenter: "HealthPlus Imaging Centre",
+      testType: "Abdominal Ultrasound",
+      date: "2026-02-28",
+      status: "Available",
+      summary: "Mild fatty liver observed. No other significant findings.",
+    },
+  ];
+
+  const commonTests = [
+    "Complete Blood Count (CBC)",
+    "Lipid Profile",
+    "Thyroid Profile",
+    "Kidney Function Test (KFT/RFT)",
+    "Liver Function Test (LFT)",
+    "Diabetes Monitoring",
+    "C-Reactive Protein (CRP)",
+    "Iron Studies",
+    "Coagulation Tests"
   ];
 
   const labCenters = [
@@ -158,21 +245,21 @@ export default function Dashboard({ user, onLogout }) {
       name: "Central Diagnostics Lab",
       address: "12, MG Road, City Center",
       contact: "+91 98765 43210",
-      tests: ["CBC", "Lipid Profile", "LFT", "KFT"],
+      tests: commonTests,
     },
     {
       id: "LAB-002",
       name: "HealthPlus Lab Centre",
       address: "2nd Floor, Health Mall, Main Street",
       contact: "+91 98123 45678",
-      tests: ["MRI Brain", "CT Scan", "X-Ray Chest"],
+      tests: commonTests,
     },
     {
       id: "LAB-003",
       name: "City Pathology & Diagnostics",
       address: "45, Green Park, Near Metro Station",
       contact: "+91 90000 11111",
-      tests: ["Thyroid Panel", "Vitamin D", "HbA1c"],
+      tests: commonTests,
     },
   ];
 
@@ -195,14 +282,7 @@ export default function Dashboard({ user, onLogout }) {
       `Doctor: ${prescription.doctorName} (${prescription.department})`,
       `Created by: ${prescription.createdBy}`,
       "",
-      "Notes:",
       prescription.notes,
-      "",
-      "Medicines:",
-      ...prescription.medicines.map(
-        (m) =>
-          `- ${m.name} | Dosage: ${m.dosage}, Frequency: ${m.frequency}, Duration: ${m.duration}`
-      ),
     ];
 
     lines.forEach((line) => {
@@ -244,11 +324,6 @@ export default function Dashboard({ user, onLogout }) {
         `Doctor: ${p.doctorName} (${p.department})`,
         `Created by: ${p.createdBy}`,
         `Notes: ${p.notes}`,
-        "Medicines:",
-        ...p.medicines.map(
-          (m) =>
-            `- ${m.name} | Dosage: ${m.dosage}, Frequency: ${m.frequency}, Duration: ${m.duration}`
-        ),
       ];
 
       lines.forEach((line) => {
@@ -506,7 +581,11 @@ export default function Dashboard({ user, onLogout }) {
             };
           });
 
-          setAppointments(formattedApps);
+          setAppointments(prev => {
+            // Merge actual API appointments with mock ones, avoiding duplicates if any
+            const nonMockPrev = prev.filter(p => !p.id.startsWith("APT-MOCK-"));
+            return [...nonMockPrev, ...formattedApps];
+          });
         } catch (err) {
           console.error("Failed to fetch appointments:", err);
         }
@@ -524,7 +603,7 @@ export default function Dashboard({ user, onLogout }) {
     { id: "Records", label: "Records", icon: FileText },
     { id: "Billing", label: "Billing", icon: CreditCard },
     { id: "LabCenters", label: "Lab Centers", icon: FileText },
-    { id: "Prescription", label: "Prescription & Tests", icon: ClipboardList },
+    { id: "Prescription", label: "Reports", icon: ClipboardList },
   ];
 
   const handleChange = (e) => {
@@ -1191,31 +1270,6 @@ export default function Dashboard({ user, onLogout }) {
                     <p className="text-sm text-gray-600 mt-1">
                       Contact: <span className="font-medium">{lab.contact}</span>
                     </p>
-                    <div className="mt-3">
-                      <p className="text-xs font-semibold text-gray-700 mb-1">
-                        Popular Tests
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {lab.tests.map((test) => (
-                          <button
-                            key={test}
-                            type="button"
-                            onClick={() => {
-                              setSelectedLabId(lab.id);
-                              setSelectedTestName(test);
-                            }}
-                            className={`px-3 py-1 rounded-full text-xs border ${
-                              selectedLabId === lab.id &&
-                              selectedTestName === test
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                            }`}
-                          >
-                            {test}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                   <div className="mt-4">
                     <button
@@ -1264,13 +1318,17 @@ export default function Dashboard({ user, onLogout }) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Test Name
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={selectedTestName}
                     onChange={(e) => setSelectedTestName(e.target.value)}
-                    placeholder="e.g., CBC, MRI Brain"
+                    disabled={!selectedLabId}
                     className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
+                  >
+                    <option value="">Select test</option>
+                    {selectedLabId && labCenters.find(l => l.id === selectedLabId)?.tests.map(test => (
+                      <option key={test} value={test}>{test}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>
@@ -1307,8 +1365,7 @@ export default function Dashboard({ user, onLogout }) {
                     }
                     const lab = labCenters.find((l) => l.id === selectedLabId);
                     setLabBookingMessage(
-                      `Your mock request for "${selectedTestName}" at "${
-                        lab?.name || ""
+                      `Your mock request for "${selectedTestName}" at "${lab?.name || ""
                       }" has been recorded. The lab will contact you for confirmation.`
                     );
                   }}
@@ -1340,12 +1397,6 @@ export default function Dashboard({ user, onLogout }) {
                     View prescriptions shared by staff and your lab / imaging test reports.
                   </p>
                 </div>
-                <button
-                  onClick={downloadPrescriptionsPdf}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm"
-                >
-                  Download All Prescriptions (PDF)
-                </button>
               </div>
             </div>
 
@@ -1403,33 +1454,6 @@ export default function Dashboard({ user, onLogout }) {
                         </button>
                       </div>
                     </div>
-
-                    <div className="mt-4">
-                      <h5 className="text-sm font-semibold text-gray-800 mb-2">
-                        Medicines
-                      </h5>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        {prescription.medicines.map((med, index) => (
-                          <div
-                            key={index}
-                            className="border border-gray-100 rounded-lg p-3 bg-blue-50/60"
-                          >
-                            <p className="font-semibold text-gray-900">
-                              {med.name}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Dosage: {med.dosage}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Frequency: {med.frequency}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Duration: {med.duration}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -1441,12 +1465,6 @@ export default function Dashboard({ user, onLogout }) {
                 <h3 className="text-xl font-semibold text-blue-700">
                   Lab Centre Reports
                 </h3>
-                <button
-                  onClick={downloadLabReportsPdf}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm"
-                >
-                  Download Lab Reports (PDF)
-                </button>
               </div>
               <div className="space-y-4">
                 {labReports.map((report) => (
@@ -1494,70 +1512,9 @@ export default function Dashboard({ user, onLogout }) {
                 ))}
               </div>
             </div>
-
-            {/* Test Reports */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-2">
-                <h3 className="text-xl font-semibold text-blue-700">
-                  Imaging / Test Reports
-                </h3>
-                <button
-                  onClick={downloadTestReportsPdf}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm"
-                >
-                  Download Test Reports (PDF)
-                </button>
-              </div>
-              <div className="space-y-4">
-                {testReports.map((report) => (
-                  <div
-                    key={report.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Report ID:</span>
-                        <span className="font-semibold text-gray-800">
-                          {report.id}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-gray-900 mt-1">
-                        {report.testCenter}
-                      </h4>
-                      <p className="text-gray-600 text-sm">
-                        Test Type: {report.testType}
-                      </p>
-                      <p className="text-gray-500 text-xs mt-1">
-                        Date:{" "}
-                        {new Date(report.date).toLocaleDateString("en-IN", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </p>
-                      <p className="text-gray-700 text-sm mt-2">
-                        {report.summary}
-                      </p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                        {report.status}
-                      </span>
-                      <button
-                        onClick={() => downloadSingleTestReportPdf(report)}
-                        className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow-sm"
-                      >
-                        Download PDF
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
-

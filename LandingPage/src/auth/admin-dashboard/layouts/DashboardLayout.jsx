@@ -43,6 +43,7 @@ export default function DashboardLayout({ userName, children }) {
           <Link to="/admin/dashboard/staff" className={linkClass('/admin/dashboard/staff')}>Staff</Link>
           <Link to="/admin/dashboard/patients" className={linkClass('/admin/dashboard/patients')}>Patients</Link>
           <Link to="/admin/dashboard/appointments" className={linkClass('/admin/dashboard/appointments')}>Appointments</Link>
+          <Link to="/admin/dashboard/lab-centers" className={linkClass('/admin/dashboard/lab-centers')}>Lab Centers</Link>
         </nav>
       </aside>
 

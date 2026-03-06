@@ -178,11 +178,10 @@ const Appointment = ({ user }) => {
     <div className="flex items-center justify-center gap-2 mb-5">
       {[1, 2, 3].map((s, i) => (
         <React.Fragment key={s}>
-          <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all duration-300 ${
-            current > s ? 'bg-sky-600 text-white' :
+          <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all duration-300 ${current > s ? 'bg-sky-600 text-white' :
             current === s ? 'bg-sky-600 text-white ring-4 ring-sky-100' :
-            'bg-sky-50 text-sky-300 border border-sky-100'
-          }`}>
+              'bg-sky-50 text-sky-300 border border-sky-100'
+            }`}>
             {current > s ? <CheckCircle size={14} /> : s}
           </div>
           {i < 2 && (
@@ -207,10 +206,10 @@ const Appointment = ({ user }) => {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-sky-900 tracking-tight leading-tight">Book an Appointment</h2>
               <p className="text-sky-500 text-sm mt-1">Choose from our specialist doctors and schedule in seconds.</p>
             </div>
-            <div className="text-right">
+            {/* <div className="text-right">
               <div className="text-2xl font-black text-sky-900">{doctorsList.length}</div>
               <div className="text-xs text-sky-500 font-medium">Doctors Available</div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -423,11 +422,10 @@ const Appointment = ({ user }) => {
                             type="button"
                             onClick={() => !isDisabled && setAppointmentTime(t)}
                             disabled={isDisabled}
-                            className={`px-2 py-2.5 rounded-xl border text-xs font-semibold transition-all ${
-                              isDisabled ? 'bg-sky-50 text-sky-200 border-sky-50 cursor-not-allowed line-through' :
+                            className={`px-2 py-2.5 rounded-xl border text-xs font-semibold transition-all ${isDisabled ? 'bg-sky-50 text-sky-200 border-sky-50 cursor-not-allowed line-through' :
                               appointmentTime === t ? 'bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-200' :
-                              'bg-white text-sky-700 border-sky-100 hover:border-sky-400 hover:bg-sky-50'
-                            }`}
+                                'bg-white text-sky-700 border-sky-100 hover:border-sky-400 hover:bg-sky-50'
+                              }`}
                           >
                             {t}
                           </button>
