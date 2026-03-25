@@ -119,6 +119,7 @@ const AppContent = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentUser(null);
+    localStorage.removeItem('access_token');
     navigate('/');
   };
 
@@ -399,7 +400,7 @@ const AppContent = () => {
         <Route path="/lab-center/dashboard" element={
           <ProtectedRoute requiredRole="labcenter">
             <LabCenterDashboardWrapper user={currentUser} onLogout={handleLogout}>
-              <LabCenterProfile />
+              <LabCenterProfile user={currentUser} />
             </LabCenterDashboardWrapper>
           </ProtectedRoute>
         } />

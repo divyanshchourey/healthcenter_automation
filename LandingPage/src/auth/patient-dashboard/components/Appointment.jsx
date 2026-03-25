@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { getAllDoctors, bookAppointment } from '../../services/apiService';
 import { Calendar, Clock, User, Search, Filter, ShieldCheck, MapPin, Star, GraduationCap, Briefcase, X, ChevronRight, ChevronLeft, CheckCircle, FileText, Upload } from 'lucide-react';
 
-const Appointment = ({ user }) => {
+const Appointment = ({ user, healthData }) => {
   const [doctorsList, setDoctorsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,11 +108,21 @@ const Appointment = ({ user }) => {
     try {
       const dateTimeStr = `${appointmentDate}T${convertTo24Hour(appointmentTime)}:00`;
       const payload = {
-        PatientID: Number(user?.userId),
-        DoctorID: Number(selectedDoctor.id),
+        PatientID: parseInt(user?.userId, 10),
+        user_id: parseInt(user?.userId, 10), // Some backend routes might expect user_id
+        DoctorID: parseInt(selectedDoctor.id, 10),
         DateTime: dateTimeStr,
         Type: "General Checkup",
-        Status: "Scheduled"
+        Status: "Scheduled",
+        // Health metrics (included as mentioned in previous error report)
+        Height: healthData?.height ? parseFloat(healthData.height) : null,
+        Weight: healthData?.weight ? parseFloat(healthData.weight) : null,
+        BloodGroup: healthData?.bloodGroup || "O+",
+        Allergies: healthData?.allergies || "None",
+        ChronicDiseases: healthData?.chronicDiseases || "None",
+        RiskCategory: healthData?.riskCategory || "Low",
+        FamilyHistory: healthData?.familyHistory || "None",
+        Lifestyle: healthData?.lifestyle || "Normal"
       };
       await bookAppointment(payload);
       setStep(3);
@@ -151,12 +161,13 @@ const Appointment = ({ user }) => {
 
   // Specialty color map for badges
   const specColors = {
-    'Cardiology': 'bg-red-50 text-red-600 border-red-100',
-    'Neurology': 'bg-purple-50 text-purple-600 border-purple-100',
-    'Orthopedics': 'bg-orange-50 text-orange-600 border-orange-100',
-    'Pediatrics': 'bg-green-50 text-green-600 border-green-100',
-    'Dermatology': 'bg-pink-50 text-pink-600 border-pink-100',
-    'General': 'bg-sky-50 text-sky-600 border-sky-100',
+    'General Physician': 'bg-sky-50 text-sky-600 border-sky-100',
+    'Gynecologist': 'bg-pink-50 text-pink-600 border-pink-100',
+    'Cardiologist': 'bg-red-50 text-red-600 border-red-100',
+    'Dermatologist': 'bg-pink-50 text-pink-600 border-pink-100',
+    'Orthopedic': 'bg-orange-50 text-orange-600 border-orange-100',
+    'Pediatrician': 'bg-green-50 text-green-600 border-green-100',
+    'Psychiatrist': 'bg-purple-50 text-purple-600 border-purple-100',
   };
   const getSpecColor = (spec) => specColors[spec] || 'bg-sky-50 text-sky-600 border-sky-100';
 

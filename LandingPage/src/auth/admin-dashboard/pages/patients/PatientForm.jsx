@@ -25,7 +25,8 @@ export default function PatientForm() {
         chronicDiseases: '',
         riskCategory: 'Low',
         familyHistory: '',
-        lifestyle: ''
+        lifestyle: '',
+        aadharNumber: ''
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -61,7 +62,8 @@ export default function PatientForm() {
                         chronicDiseases: profileData?.ChronicDiseases || '',
                         riskCategory: profileData?.RiskCategory || 'Low',
                         familyHistory: profileData?.FamilyHistory || '',
-                        lifestyle: profileData?.Lifestyle || ''
+                        lifestyle: profileData?.Lifestyle || '',
+                        aadharNumber: userDetails.AadharNumber || ''
                     })
                 } catch (err) {
                     console.error('Failed to load patient data', err)
@@ -90,14 +92,15 @@ export default function PatientForm() {
             if (!id || id === 'new') {
                 const registerPayload = {
                     FirstName: form.firstName,
-                    LastName: form.lastName,
+                    LastName: form.lastName || null,
                     Email: form.email,
                     Phone: form.phoneNumber,
                     Password: form.password || 'Patient@123', // Default if empty
                     RoleID: 3, // Patient
-                    Gender: form.gender,
-                    DOB: form.dateOfBirth,
-                    Address: form.address
+                    Gender: form.gender || null,
+                    DOB: form.dateOfBirth || null,
+                    AadharNumber: form.aadharNumber,
+                    Address: form.address || null
                 }
                 const registeredUser = await registerAccount(registerPayload)
                 userId = registeredUser.UserID || registeredUser.id
@@ -106,16 +109,15 @@ export default function PatientForm() {
 
             // Step 2: Create or Update Patient Profile
             const profilePayload = {
-                BloodGroup: form.bloodGroup,
-                EmergencyContact: form.emergencyContact,
-                MedicalHistory: form.medicalHistory,
-                Allergies: form.allergies,
-                Height: Number(form.height) || 0,
-                Weight: Number(form.weight) || 0,
+                BloodGroup: form.bloodGroup || null,
+                Allergies: form.allergies || 'None',
+                Height: Number(form.height) || null,
+                Weight: Number(form.weight) || null,
                 ChronicDiseases: form.chronicDiseases || 'None',
-                RiskCategory: form.riskCategory,
+                RiskCategory: form.riskCategory || 'Low',
                 FamilyHistory: form.familyHistory || 'None',
-                Lifestyle: form.lifestyle || 'None'
+                Lifestyle: form.lifestyle || 'None',
+                PatientID: Number(userId)
             }
 
             await createOrUpdatePatientProfile(userId, profilePayload)
@@ -184,6 +186,10 @@ export default function PatientForm() {
                         <div>
                             <label className="block text-sm text-gray-600">Date Of Birth</label>
                             <input type="date" className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.dateOfBirth || ''} onChange={(e) => update('dateOfBirth', e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm text-gray-600">Aadhar Number</label>
+                            <input className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.aadharNumber || ''} onChange={(e) => update('aadharNumber', e.target.value)} maxLength={12} required />
                         </div>
                         <div className="md:col-span-1">
                             <label className="block text-sm text-gray-600">Address</label>

@@ -1,51 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { User, Calendar, FileText, Menu, X, Clock, CheckCircle, CreditCard, ClipboardList } from "lucide-react";
 import { jsPDF } from "jspdf";
 import Appointment from "../components/Appointment";
-import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientAppointments, getAllDoctors } from "../../services/apiService";
+import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientCategorizedAppointments, getAllDoctors, getPatientAvailableLabs, bookLabTest, getPatientLabBookings, getPatientPrescriptions, getBillDetails } from "../../services/apiService";
+
 
 export default function Dashboard({ user, onLogout }) {
   const [activeMenu, setActiveMenu] = useState("Profile");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [patientName, setPatientName] = useState(user?.name || "Patient");
-  const [appointments, setAppointments] = useState([
-    {
-      id: "APT-MOCK-001",
-      doctorName: "Dr. Sarah Johnson",
-      specialization: "General Physician",
-      date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      time: "10:30 AM",
-      status: "Confirmed",
-      type: "today"
-    },
-    {
-      id: "APT-MOCK-002",
-      doctorName: "Dr. Michael Chen",
-      specialization: "Cardiologist",
-      date: new Date(Date.now() + 86400000).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      time: "02:00 PM",
-      status: "Confirmed",
-      type: "upcoming"
-    },
-    {
-      id: "APT-MOCK-003",
-      doctorName: "Dr. Emily Brown",
-      specialization: "Dermatologist",
-      date: new Date(Date.now() - 172800000).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      time: "11:15 AM",
-      status: "Completed",
-      type: "previous"
-    },
-    {
-      id: "APT-MOCK-004",
-      doctorName: "Dr. Robert Wilson",
-      specialization: "Neurologist",
-      date: new Date(Date.now() + 259200000).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      time: "09:45 AM",
-      status: "Confirmed",
-      type: "upcoming"
-    }
-  ]);
+  const [appointments, setAppointments] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     email: user?.email || "",
@@ -56,122 +20,28 @@ export default function Dashboard({ user, onLogout }) {
     bloodGroup: "",
     height: "",
     weight: "",
-    bloodPressure: "",
     allergies: "",
-    pastDisease: "",
-    sugarLevel: "",
     familyHistory: "",
     chronicDiseases: "",
     riskCategory: "",
     lifestyle: "",
   });
 
-  const doctorBills = [
-    {
-      id: "DB-001",
-      doctorName: "Dr. John Smith",
-      specialization: "Cardiologist",
-      date: "2026-02-14",
-      description: "Consultation + ECG",
-      amount: 1200,
-      status: "Paid",
-      paymentMethod: "UPI",
-    },
-    {
-      id: "DB-002",
-      doctorName: "Dr. Anita Verma",
-      specialization: "Dermatologist",
-      date: "2026-02-25",
-      description: "Consultation",
-      amount: 700,
-      status: "Pending",
-      paymentMethod: "Cash",
-    },
-  ];
+  const SPECIALTY_PRICES = {
+    "General Physician": 800,
+    "Gynecologist": 1500,
+    "Cardiologist": 3000,
+    "Dermatologist": 2000,
+    "Orthopedic": 1500,
+    "Pediatrician": 1200,
+    "Psychiatrist": 2500,
+  };
+  const DEFAULT_PRICE = 500;
 
-  const labBills = [
-    {
-      id: "LB-101",
-      labName: "Central Diagnostics Lab",
-      testName: "Complete Blood Count (CBC)",
-      date: "2026-01-30",
-      amount: 550,
-      status: "Paid",
-      paymentMethod: "Credit Card",
-    },
-    {
-      id: "LB-102",
-      labName: "HealthPlus Lab Centre",
-      testName: "MRI Brain",
-      date: "2026-02-10",
-      amount: 3200,
-      status: "Pending",
-      paymentMethod: "Net Banking",
-    },
-  ];
 
-  const prescriptions = [
-    {
-      id: "PR-001",
-      date: "2026-02-12",
-      doctorName: "Dr. John Smith",
-      department: "Cardiology",
-      createdBy: "OPD Staff",
-      notes: "Continue medication for 2 weeks. Monitor blood pressure daily.",
-      medicines: [
-        {
-          name: "Amlodipine 5mg",
-          dosage: "1 tablet",
-          frequency: "Once daily",
-          duration: "14 days",
-        },
-        {
-          name: "Atorvastatin 10mg",
-          dosage: "1 tablet",
-          frequency: "At night",
-          duration: "30 days",
-        },
-      ],
-    },
-    {
-      id: "PR-002",
-      date: "2026-02-26",
-      doctorName: "Dr. Anita Verma",
-      department: "Dermatology",
-      createdBy: "Front Desk Staff",
-      notes: "Apply ointment twice daily. Avoid direct sunlight.",
-      medicines: [
-        {
-          name: "Hydrocortisone cream",
-          dosage: "Pea-sized amount",
-          frequency: "Twice daily",
-          duration: "7 days",
-        },
-      ],
-    },
-    {
-      id: "PR-003",
-      date: "2026-03-01",
-      doctorName: "Dr. Robert Wilson",
-      department: "Neurology",
-      createdBy: "OPD Staff",
-      notes: "Take enough rest and stay hydrated. Follow up after 10 days.",
-      medicines: [
-        {
-          name: "Sumatriptan 50mg",
-          dosage: "1 tablet",
-          frequency: "When needed for migraine",
-          duration: "5 days",
-        },
-        {
-          name: "Magnesium supplement",
-          dosage: "1 tablet",
-          frequency: "Once daily",
-          duration: "30 days",
-        },
-      ],
-    },
-  ];
+
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [isLoadingPrescriptions, setIsLoadingPrescriptions] = useState(false);
 
   const labReports = [
     {
@@ -228,45 +98,46 @@ export default function Dashboard({ user, onLogout }) {
   ];
 
   const commonTests = [
-    "Complete Blood Count (CBC)",
-    "Lipid Profile",
-    "Thyroid Profile",
-    "Kidney Function Test (KFT/RFT)",
-    "Liver Function Test (LFT)",
-    "Diabetes Monitoring",
-    "C-Reactive Protein (CRP)",
-    "Iron Studies",
-    "Coagulation Tests"
-  ];
-
-  const labCenters = [
-    {
-      id: "LAB-001",
-      name: "Central Diagnostics Lab",
-      address: "12, MG Road, City Center",
-      contact: "+91 98765 43210",
-      tests: commonTests,
-    },
-    {
-      id: "LAB-002",
-      name: "HealthPlus Lab Centre",
-      address: "2nd Floor, Health Mall, Main Street",
-      contact: "+91 98123 45678",
-      tests: commonTests,
-    },
-    {
-      id: "LAB-003",
-      name: "City Pathology & Diagnostics",
-      address: "45, Green Park, Near Metro Station",
-      contact: "+91 90000 11111",
-      tests: commonTests,
-    },
+    { id: 5, name: "Complete Blood Count (CBC)", price: 200 },
+    { id: 6, name: "Lipid Profile", price: 600 },
+    { id: 7, name: "Thyroid Profile", price: 500 },
+    { id: 8, name: "Kidney Function Test (KFT/RFT)", price: 700 },
+    { id: 9, name: "Liver Function Test (LFT)", price: 700 },
+    { id: 10, name: "Diabetes Monitoring", price: 600 },
+    { id: 11, name: "C-Reactive Protein (CRP)", price: 500 },
+    { id: 12, name: "Iron Studies", price: 800 },
+    { id: 13, name: "Coagulation Tests", price: 900 }
   ];
 
   const [selectedLabId, setSelectedLabId] = useState("");
   const [selectedTestName, setSelectedTestName] = useState("");
+  const [selectedInvestigationId, setSelectedInvestigationId] = useState("");
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState("");
   const [labBookingNote, setLabBookingNote] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [labBookingMessage, setLabBookingMessage] = useState("");
+  const [labCenters, setLabCenters] = useState([]);
+  const [labBookings, setLabBookings] = useState([]);
+  const [isLoadingLabs, setIsLoadingLabs] = useState(false);
+  const [isLoadingBookings, setIsLoadingBookings] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
+  const [docBillStatuses, setDocBillStatuses] = useState({});
+
+  const labBills = useMemo(() => {
+    return labBookings.map(booking => {
+      const test = commonTests.find(t => t.id == booking.InvestigationID);
+      const lab = labCenters.find(l => (l.id || l.LabID) == booking.LabID);
+      return {
+        id: booking.BookingID || booking.id || `LB-${booking.LabID}`,
+        labName: lab?.name || lab?.Name || lab?.LabName || `Lab #${booking.LabID}`,
+        testName: test?.name || `Investigation #${booking.InvestigationID}`,
+        date: booking.date || booking.InvestigationDate,
+        amount: test?.price || 0,
+        status: (booking.status || booking.Status) === "Completed" ? "Paid" : "Pending",
+        paymentMethod: "N/A"
+      };
+    });
+  }, [labBookings, labCenters, commonTests]);
 
   const downloadSinglePrescriptionPdf = (prescription) => {
     const doc = new jsPDF();
@@ -548,44 +419,40 @@ export default function Dashboard({ user, onLogout }) {
         // Fetch appointments for Records section
         try {
           const [apps, docs] = await Promise.all([
-            getPatientAppointments(user.userId),
+            getPatientCategorizedAppointments(user.userId),
             getAllDoctors()
           ]);
 
-          const appointmentsArray = Array.isArray(apps) ? apps : (apps?.data || []);
+          const categorizedApps = apps?.data || apps || {};
           const doctorsArray = Array.isArray(docs) ? docs : (docs?.data || []);
 
-          const formattedApps = appointmentsArray.map(app => {
+          const formatApp = (app, category) => {
             const doctor = doctorsArray.find(d => (d.DoctorID || d.id || d.UserID) === app.DoctorID);
             const appDate = new Date(app.DateTime);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const dateOnly = new Date(appDate);
-            dateOnly.setHours(0, 0, 0, 0);
-
-            let type = "upcoming";
-            if (dateOnly.getTime() === today.getTime()) {
-              type = "today";
-            } else if (dateOnly.getTime() < today.getTime()) {
-              type = "previous";
-            }
+            const specialty = doctor?.Specialization || "General";
+            const amount = SPECIALTY_PRICES[specialty] || DEFAULT_PRICE;
 
             return {
               id: app.AppointmentID || app.id,
               doctorName: doctor ? `Dr. ${doctor.FirstName} ${doctor.LastName}` : `Doctor #${app.DoctorID}`,
-              specialization: doctor?.Specialization || "General",
+              specialization: specialty,
               date: appDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+              rawDate: app.DateTime,
               time: appDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-              status: app.Status || "Scheduled",
-              type: type
+              status: (category === 'past' && (app.Status === "Scheduled" || !app.Status)) ? "Completed" : (app.Status || "Scheduled"),
+              type: category === 'past' ? 'previous' : category,
+              amount: amount,
+              description: "Doctor Consultation Fee"
             };
-          });
+          };
 
-          setAppointments(prev => {
-            // Merge actual API appointments with mock ones, avoiding duplicates if any
-            const nonMockPrev = prev.filter(p => !p.id.startsWith("APT-MOCK-"));
-            return [...nonMockPrev, ...formattedApps];
-          });
+          const formattedApps = [
+            ...(categorizedApps.today || []).map(app => formatApp(app, 'today')),
+            ...(categorizedApps.upcoming || []).map(app => formatApp(app, 'upcoming')),
+            ...(categorizedApps.past || []).map(app => formatApp(app, 'past'))
+          ];
+
+          setAppointments(formattedApps);
         } catch (err) {
           console.error("Failed to fetch appointments:", err);
         }
@@ -596,6 +463,81 @@ export default function Dashboard({ user, onLogout }) {
 
     fetchData();
   }, [user?.userId]);
+
+  useEffect(() => {
+    const fetchLabData = async () => {
+      if (activeMenu === "LabCenters") {
+        setIsLoadingLabs(true);
+        setIsLoadingBookings(true);
+        try {
+          const [labs, bookings] = await Promise.all([
+            getPatientAvailableLabs(),
+            getPatientLabBookings(user.userId)
+          ]);
+
+          setLabCenters(Array.isArray(labs) ? labs : (labs?.data || []));
+          setLabBookings(Array.isArray(bookings) ? bookings : (bookings?.data || []));
+        } catch (error) {
+          console.error("Failed to fetch lab data:", error);
+        } finally {
+          setIsLoadingLabs(false);
+          setIsLoadingBookings(false);
+        }
+      }
+    };
+
+    fetchLabData();
+  }, [activeMenu, user?.userId]);
+
+  useEffect(() => {
+    const fetchPrescriptionsData = async () => {
+      if (activeMenu === "Prescription") {
+        setIsLoadingPrescriptions(true);
+        try {
+          const res = await getPatientPrescriptions();
+          const items = Array.isArray(res) ? res : (res?.data || []);
+          setPrescriptions(items);
+        } catch (error) {
+          console.error("Failed to fetch prescriptions:", error);
+        } finally {
+          setIsLoadingPrescriptions(false);
+        }
+      }
+    };
+
+    fetchPrescriptionsData();
+  }, [activeMenu, user?.userId]);
+
+  useEffect(() => {
+    if (activeMenu === "Billing" && appointments.length > 0) {
+      const checkBills = async () => {
+        let hasChanges = false;
+        const newStatuses = {};
+        
+        await Promise.all(
+          appointments.map(async (app) => {
+            // We only need to check if we don't know the status yet
+            if (docBillStatuses[app.id] === undefined && newStatuses[app.id] === undefined) {
+              try {
+                await getBillDetails(app.id);
+                newStatuses[app.id] = true;
+                hasChanges = true;
+              } catch (error) {
+                newStatuses[app.id] = false;
+                hasChanges = true;
+              }
+            }
+          })
+        );
+        
+        if (hasChanges) {
+          setDocBillStatuses(prev => ({ ...prev, ...newStatuses }));
+        }
+      };
+      
+      checkBills();
+    }
+  }, [activeMenu, appointments]); // only run when activeMenu or appointments change
 
   const menuItems = [
     { id: "Profile", label: "Profile", icon: User },
@@ -627,10 +569,7 @@ export default function Dashboard({ user, onLogout }) {
         FamilyHistory: formData.familyHistory,
         ChronicDiseases: formData.chronicDiseases,
         RiskCategory: formData.riskCategory,
-        Lifestyle: formData.lifestyle,
-        BloodPressure: formData.bloodPressure,
-        SugarLevel: formData.sugarLevel,
-        PastDisease: formData.pastDisease
+        Lifestyle: formData.lifestyle
       };
 
       await createOrUpdatePatientProfile(user.userId, data);
@@ -828,49 +767,6 @@ export default function Dashboard({ user, onLogout }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-500">
-                    Blood Pressure
-                  </label>
-                  <select
-                    name="bloodPressure"
-                    value={formData.bloodPressure}
-                    onChange={handleChange}
-                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  >
-                    <option value="">Select Blood Pressure</option>
-                    <option value="very_low">Very Low</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="very_high">Very High</option>
-                  </select>
-                  {formData.bloodPressure && (
-                    <div className="mt-2">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${formData.bloodPressure === "high"
-                          ? "bg-red-100 text-red-600"
-                          : formData.bloodPressure === "very_high"
-                            ? "bg-red-200 text-red-700"
-                            : formData.bloodPressure === "low" || formData.bloodPressure === "very_low"
-                              ? "bg-green-100 text-green-700"
-                              : formData.bloodPressure === "medium"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-gray-100 text-gray-700"
-                          }`}
-                      >
-                        {`Current: ${{
-                          very_low: "Very Low",
-                          low: "Low",
-                          medium: "Medium",
-                          high: "High",
-                          very_high: "Very High",
-                        }[formData.bloodPressure] || formData.bloodPressure
-                          }`}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div>
                   <label className="block text-sm text-gray-500">Allergies</label>
                   <input
                     type="text"
@@ -880,61 +776,7 @@ export default function Dashboard({ user, onLogout }) {
                     className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:ring-2 focus:ring-blue-400"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm text-gray-500">
-                    Past Disease
-                  </label>
-                  <input
-                    type="text"
-                    name="pastDisease"
-                    value={formData.pastDisease}
-                    onChange={handleChange}
-                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:ring-2 focus:ring-blue-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Blood Sugar Level
-                  </label>
-                  <select
-                    name="sugarLevel"
-                    value={formData.sugarLevel}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all"
-                  >
-                    <option value="">Select Sugar Level</option>
-                    <option value="very_low">Very Low</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="very_high">Very High</option>
-                  </select>
-                  {formData.sugarLevel && (
-                    <div className="mt-2">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${formData.sugarLevel === "high"
-                          ? "bg-red-100 text-red-600"
-                          : formData.sugarLevel === "very_high"
-                            ? "bg-red-200 text-red-700"
-                            : formData.sugarLevel === "low" || formData.sugarLevel === "very_low"
-                              ? "bg-green-100 text-green-700"
-                              : formData.sugarLevel === "medium"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-gray-100 text-gray-700"
-                          }`}
-                      >
-                        {`Current: ${{
-                          very_low: "Very Low",
-                          low: "Low",
-                          medium: "Medium",
-                          high: "High",
-                          very_high: "Very High",
-                        }[formData.sugarLevel] || formData.sugarLevel
-                          }`}
-                      </span>
-                    </div>
-                  )}
-                </div>
+
                 <div>
                   <label className="block text-sm text-gray-500">
                     Family History
@@ -997,7 +839,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Appointment Section */}
         {activeMenu === "Appointment" && (
           <div className="max-w-full mx-auto">
-            <Appointment user={user} />
+            <Appointment user={user} healthData={formData} />
           </div>
         )}
 
@@ -1136,54 +978,58 @@ export default function Dashboard({ user, onLogout }) {
                 Doctor Bills
               </h3>
               <div className="space-y-4">
-                {doctorBills.map((bill) => (
-                  <div
-                    key={bill.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Bill ID:</span>
-                        <span className="font-semibold text-gray-800">
-                          {bill.id}
-                        </span>
+                {appointments.length > 0 ? (
+                  appointments.map((bill) => (
+                    <div
+                      key={bill.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">Bill ID:</span>
+                          <span className="font-semibold text-gray-800">
+                            {bill.id}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-gray-900 mt-1">
+                          {bill.doctorName}
+                        </h4>
+                        <p className="text-gray-600 text-sm">
+                          {bill.specialization}
+                        </p>
+                        <p className="text-gray-600 text-sm mt-2">
+                          {bill.description}
+                        </p>
+                        <p className="text-gray-500 text-xs mt-1">
+                          Date:{" "}
+                          {new Date(bill.rawDate).toLocaleDateString("en-IN", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
                       </div>
-                      <h4 className="font-bold text-gray-900 mt-1">
-                        {bill.doctorName}
-                      </h4>
-                      <p className="text-gray-600 text-sm">
-                        {bill.specialization}
-                      </p>
-                      <p className="text-gray-600 text-sm mt-2">
-                        {bill.description}
-                      </p>
-                      <p className="text-gray-500 text-xs mt-1">
-                        Date:{" "}
-                        {new Date(bill.date).toLocaleDateString("en-IN", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </p>
+                      <div className="text-right space-y-2">
+                        <p className="text-lg font-bold text-blue-700">
+                          ₹{bill.amount.toLocaleString("en-IN")}
+                        </p>
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${docBillStatuses[bill.id]
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                            }`}
+                        >
+                          {docBillStatuses[bill.id] ? "Paid" : "Pending"}
+                        </span>
+                        <p className="text-xs text-gray-500">
+                          Payment: N/A
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right space-y-2">
-                      <p className="text-lg font-bold text-blue-700">
-                        ₹{bill.amount.toLocaleString("en-IN")}
-                      </p>
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${bill.status === "Paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                          }`}
-                      >
-                        {bill.status}
-                      </span>
-                      <p className="text-xs text-gray-500">
-                        Payment: {bill.paymentMethod}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No doctor bills found.</p>
+                )}
               </div>
             </div>
 
@@ -1264,20 +1110,21 @@ export default function Dashboard({ user, onLogout }) {
                 >
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {lab.name}
+                      {lab.name || lab.Name || lab.LabName || "Unnamed Lab"}
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">{lab.address}</p>
+                    <p className="text-sm text-gray-600 mt-1">{lab.address || lab.Address || lab.LabAddress || "No address"}</p>
                     <p className="text-sm text-gray-600 mt-1">
-                      Contact: <span className="font-medium">{lab.contact}</span>
+                      Contact: <span className="font-medium">{lab.contact || lab.Contact || lab.Phone || lab.LabPhone || "N/A"}</span>
                     </p>
                   </div>
                   <div className="mt-4">
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedLabId(lab.id);
-                        if (!selectedTestName && lab.tests.length > 0) {
-                          setSelectedTestName(lab.tests[0]);
+                        setSelectedLabId(lab.id || lab.LabID);
+                        if (!selectedTestName && commonTests.length > 0) {
+                          setSelectedTestName(commonTests[0].name);
+                          setSelectedInvestigationId(commonTests[0].id);
                         }
                       }}
                       className="w-full mt-1 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
@@ -1302,14 +1149,30 @@ export default function Dashboard({ user, onLogout }) {
                     value={selectedLabId}
                     onChange={(e) => {
                       setSelectedLabId(e.target.value);
-                      setSelectedTestName("");
                     }}
                     className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   >
                     <option value="">Select lab center</option>
                     {labCenters.map((lab) => (
-                      <option key={lab.id} value={lab.id}>
-                        {lab.name}
+                      <option key={lab.id || lab.LabID} value={lab.id || lab.LabID}>
+                        {lab.name || lab.Name || lab.LabName || lab.labName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Related Appointment
+                  </label>
+                  <select
+                    value={selectedAppointmentId}
+                    onChange={(e) => setSelectedAppointmentId(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select appointment</option>
+                    {appointments.filter(a => a.status === "Scheduled").map((app) => (
+                      <option key={app.id} value={app.id}>
+                        {app.doctorName} - {app.date}
                       </option>
                     ))}
                   </select>
@@ -1319,16 +1182,33 @@ export default function Dashboard({ user, onLogout }) {
                     Test Name
                   </label>
                   <select
-                    value={selectedTestName}
-                    onChange={(e) => setSelectedTestName(e.target.value)}
+                    value={selectedInvestigationId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setSelectedInvestigationId(id);
+                      const test = commonTests.find(t => t.id === Number(id));
+                      setSelectedTestName(test ? test.name : "");
+                    }}
                     disabled={!selectedLabId}
                     className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   >
                     <option value="">Select test</option>
-                    {selectedLabId && labCenters.find(l => l.id === selectedLabId)?.tests.map(test => (
-                      <option key={test} value={test}>{test}</option>
+                    {commonTests.map(test => (
+                      <option key={test.id} value={test.id}>{test.name}</option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Date
+                  </label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
                 </div>
               </div>
               <div>
@@ -1349,6 +1229,9 @@ export default function Dashboard({ user, onLogout }) {
                   onClick={() => {
                     setSelectedLabId("");
                     setSelectedTestName("");
+                    setSelectedInvestigationId("");
+                    setSelectedAppointmentId("");
+                    setSelectedDate("");
                     setLabBookingNote("");
                     setLabBookingMessage("");
                   }}
@@ -1358,20 +1241,50 @@ export default function Dashboard({ user, onLogout }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (!selectedLabId || !selectedTestName) {
-                      alert("Please select a lab and test name.");
+                  disabled={isBooking}
+                  onClick={async () => {
+                    if (!selectedLabId || !selectedInvestigationId || !selectedDate || !selectedAppointmentId) {
+                      alert("Please select a lab, test name, date, and related appointment.");
                       return;
                     }
-                    const lab = labCenters.find((l) => l.id === selectedLabId);
-                    setLabBookingMessage(
-                      `Your mock request for "${selectedTestName}" at "${lab?.name || ""
-                      }" has been recorded. The lab will contact you for confirmation.`
-                    );
+
+                    setIsBooking(true);
+                    try {
+                      const payload = {
+                        AppointmentID: Number(selectedAppointmentId),
+                        InvestigationID: Number(selectedInvestigationId),
+                        LabID: Number(selectedLabId),
+                        InvestigationDate: selectedDate
+                      };
+
+                      await bookLabTest(selectedLabId, payload);
+
+                      const lab = labCenters.find((l) => (l.id || l.LabID) == selectedLabId);
+                      const labName = lab?.name || lab?.Name || lab?.LabName || lab?.labName || "";
+                      const formattedDate = new Date(selectedDate).toLocaleDateString("en-IN", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      });
+
+                      setLabBookingMessage(
+                        `Your request for "${selectedTestName}" at "${labName}" on ${formattedDate} has been confirmed.`
+                      );
+
+                      // Refresh bookings
+                      const bookings = await getPatientLabBookings(user.userId);
+                      setLabBookings(Array.isArray(bookings) ? bookings : (bookings?.data || []));
+
+                    } catch (error) {
+                      console.error("Booking failed:", error);
+                      alert(error.message || "Failed to book test.");
+                    } finally {
+                      setIsBooking(false);
+                    }
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                  className={`bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors ${isBooking ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  Book Test (Mock)
+                  {isBooking ? 'Booking...' : 'Book Test'}
                 </button>
               </div>
               {labBookingMessage && (
@@ -1379,6 +1292,68 @@ export default function Dashboard({ user, onLogout }) {
                   {labBookingMessage}
                 </p>
               )}
+            </div>
+
+            {/* Past Test Bookings Section */}
+            <div className="bg-white rounded-xl shadow-md p-6 space-y-4">
+              <h3 className="text-xl font-semibold text-blue-700">
+                Your Past Test Bookings
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-blue-50 text-blue-800 text-sm font-semibold">
+                      <th className="p-3 border-b">Date</th>
+                      <th className="p-3 border-b">Lab Center</th>
+                      <th className="p-3 border-b">Test Name</th>
+                      <th className="p-3 border-b text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {labBookings.map((booking) => {
+                      const lab = labCenters.find(l => (l.id || l.LabID) == booking.LabID);
+                      const test = commonTests.find(t => t.id == booking.InvestigationID);
+
+                      return (
+                        <tr key={booking.id || booking.BookingID} className="hover:bg-blue-50/50 transition-colors text-sm text-gray-700">
+                          <td className="p-3 border-b">
+                            {new Date(booking.date || booking.InvestigationDate).toLocaleDateString("en-IN", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </td>
+                          <td className="p-3 border-b">
+                            {booking.labName || booking.LabName || lab?.name || lab?.Name || lab?.LabName || `Lab #${booking.LabID}`}
+                          </td>
+                          <td className="p-3 border-b">
+                            {booking.testName || booking.TestName || test?.name || `Investigation #${booking.InvestigationID}`}
+                          </td>
+                          <td className="p-3 border-b text-center">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${(booking.status || booking.Status) === "Completed"
+                                ? "bg-green-100 text-green-700"
+                                : (booking.status || booking.Status) === "Confirmed" || (booking.status || booking.Status) || (booking.status || booking.Status) === "Scheduled" || (booking.status || booking.Status) === "PENDING"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                                }`}
+                            >
+                              {booking.status || booking.Status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {labBookings.length === 0 && (
+                      <tr>
+                        <td colSpan="4" className="p-6 text-center text-gray-500 italic">
+                          {isLoadingBookings ? "Loading bookings..." : "No past bookings found."}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -1406,56 +1381,59 @@ export default function Dashboard({ user, onLogout }) {
                 Prescriptions
               </h3>
               <div className="space-y-4">
-                {prescriptions.map((prescription) => (
-                  <div
-                    key={prescription.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-500">
-                            Prescription ID:
-                          </span>
-                          <span className="font-semibold text-gray-800">
-                            {prescription.id}
-                          </span>
+                {isLoadingPrescriptions ? (
+                  <p className="text-gray-500 text-center py-4">Loading prescriptions...</p>
+                ) : prescriptions.length > 0 ? (
+                  prescriptions.map((prescription) => (
+                    <div
+                      key={`${prescription.ConsultationID}-${prescription.AppointmentID}`}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">
+                              Appointment ID:
+                            </span>
+                            <span className="font-semibold text-gray-800">
+                              {prescription.AppointmentID}
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-gray-900 mt-1">
+                            Dr. {prescription.DoctorName}
+                          </h4>
+                          <p className="text-gray-500 text-xs">
+                            Date:{" "}
+                            {new Date(prescription.DateTime).toLocaleDateString(
+                              "en-IN",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </p>
                         </div>
-                        <h4 className="font-bold text-gray-900 mt-1">
-                          {prescription.doctorName}
-                        </h4>
-                        <p className="text-gray-600 text-sm">
-                          {prescription.department}
-                        </p>
-                        <p className="text-gray-500 text-xs mt-1">
-                          Created by: {prescription.createdBy}
-                        </p>
-                        <p className="text-gray-500 text-xs">
-                          Date:{" "}
-                          {new Date(prescription.date).toLocaleDateString(
-                            "en-IN",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }
+                        <div className="mt-3 md:mt-0">
+                          {prescription.DownloadURL ? (
+                            <a
+                              href={prescription.DownloadURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow-sm"
+                            >
+                              Download PDF
+                            </a>
+                          ) : (
+                            <span className="text-xs text-gray-500 italic">No PDF available</span>
                           )}
-                        </p>
-                        <p className="text-gray-700 text-sm mt-3">
-                          {prescription.notes}
-                        </p>
-                      </div>
-                      <div className="mt-3 md:mt-0">
-                        <button
-                          onClick={() => downloadSinglePrescriptionPdf(prescription)}
-                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow-sm"
-                        >
-                          Download PDF
-                        </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No prescriptions found.</p>
+                )}
               </div>
             </div>
 
@@ -1467,49 +1445,9 @@ export default function Dashboard({ user, onLogout }) {
                 </h3>
               </div>
               <div className="space-y-4">
-                {labReports.map((report) => (
-                  <div
-                    key={report.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Report ID:</span>
-                        <span className="font-semibold text-gray-800">
-                          {report.id}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-gray-900 mt-1">
-                        {report.labName}
-                      </h4>
-                      <p className="text-gray-600 text-sm">
-                        Test: {report.testName}
-                      </p>
-                      <p className="text-gray-500 text-xs mt-1">
-                        Date:{" "}
-                        {new Date(report.date).toLocaleDateString("en-IN", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </p>
-                      <p className="text-gray-700 text-sm mt-2">
-                        {report.summary}
-                      </p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                        {report.status}
-                      </span>
-                      <button
-                        onClick={() => downloadSingleLabReportPdf(report)}
-                        className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow-sm"
-                      >
-                        Download PDF
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                <p className="text-gray-500 text-center py-4">
+                  No lab center reports avali.
+                </p>
               </div>
             </div>
           </div>

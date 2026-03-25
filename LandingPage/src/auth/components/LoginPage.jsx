@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { User, Heart, Shield, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { getRoleConfig } from '../utils/roleConfig.jsx';
 import { validateLoginForm } from '../utils/validation.jsx';
-import { loginPatientAccount, loginDoctorAccount, loginStaffAccount } from '../services/apiService.js';
+import { loginPatientAccount, loginDoctorAccount, loginStaffAccount, loginAdminAccount, loginLabCenterAccount } from '../services/apiService.js';
 import LoadingSpinner from './common/LoadingSpinner.jsx';
 
 const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
@@ -67,6 +67,11 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
           throw new Error('Invalid user data received. Please try again.');
         }
 
+        // Store token if present
+        if (loginResponse.access_token) {
+          localStorage.setItem('access_token', loginResponse.access_token);
+        }
+
         // Only proceed with login if all validations pass
         onLogin({
           email: loginResponse.user.Email,
@@ -92,6 +97,10 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
 
         if (!loginResponse.user.Email || !loginResponse.user.UserID) {
           throw new Error('Invalid user data received. Please try again.');
+        }
+
+        if (loginResponse.access_token) {
+          localStorage.setItem('access_token', loginResponse.access_token);
         }
 
         onLogin({
@@ -122,6 +131,10 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
           throw new Error('Invalid user data received. Please try again.');
         }
 
+        if (loginResponse.access_token) {
+          localStorage.setItem('access_token', loginResponse.access_token);
+        }
+
         onLogin({
           email: loginResponse.user.Email,
           role: role,
@@ -130,31 +143,79 @@ const LoginPage = ({ role, onBack, onRegister, onLogin }) => {
           roleId: loginResponse.user.RoleID,
         });
       } else if (role === 'admin') {
-        // Admin login with specific credentials
+        // Hardcoded admin login special case
         if (formData.email === 'admin@gmail.com' && formData.password === 'adminLogin') {
+          const mockAdmin = {
+            Email: 'admin@gmail.com',
+            FirstName: 'Admin',
+            LastName: 'User',
+            UserID: 1,
+            RoleID: 1,
+          };
+          
+          localStorage.setItem('access_token', 'mock-admin-token');
           onLogin({
-            email: formData.email,
+            email: mockAdmin.Email,
             role: 'admin',
-            name: 'Admin User',
-            userId: 1,
-            roleId: 1,
+            name: `${mockAdmin.FirstName} ${mockAdmin.LastName}`.trim(),
+            userId: mockAdmin.UserID,
+            roleId: mockAdmin.RoleID,
           });
-        } else {
-          throw new Error('Invalid admin credentials. Please check your email and password.');
+          setIsSubmitting(false);
+          return;
         }
+
+        // Real admin login (if any)
+        const loginResponse = await loginAdminAccount({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (!loginResponse || !loginResponse.user) {
+          throw new Error('Invalid response from server. Please try again.');
+        }
+
+        if (loginResponse.user.RoleID !== 1) {
+          throw new Error('Access denied. This account is not authorized for admin access.');
+        }
+
+        if (loginResponse.access_token) {
+          localStorage.setItem('access_token', loginResponse.access_token);
+        }
+
+        onLogin({
+          email: loginResponse.user.Email,
+          role: 'admin',
+          name: `${loginResponse.user.FirstName} ${loginResponse.user.LastName ?? ''}`.trim() || 'Admin User',
+          userId: loginResponse.user.UserID,
+          roleId: loginResponse.user.RoleID,
+        });
       } else if (role === 'labcenter') {
-        // Lab Center login with hardcoded credentials
-        if (formData.email === 'labcenter@gmail.com' && formData.password === 'lab1234') {
-          onLogin({
-            email: formData.email,
-            role: 'labcenter',
-            name: 'Lab Center User',
-            userId: 501, // Mock user ID
-            roleId: 5,
-          });
-        } else {
-          throw new Error('Invalid Lab Center credentials. Please check your email and password.');
+        // Authenticate lab center owner using general /auth/login and enforce RoleID = 5
+        const loginResponse = await loginLabCenterAccount({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (!loginResponse || !loginResponse.user) {
+          throw new Error('Invalid response from server. Please try again.');
         }
+
+        if (loginResponse.user.RoleID !== 5) {
+          throw new Error('Access denied. This account is not authorized for lab center access.');
+        }
+
+        if (loginResponse.access_token) {
+          localStorage.setItem('access_token', loginResponse.access_token);
+        }
+
+        onLogin({
+          email: loginResponse.user.Email,
+          role: 'labcenter',
+          name: `${loginResponse.user.FirstName} ${loginResponse.user.LastName ?? ''}`.trim() || 'Lab Center User',
+          userId: loginResponse.user.UserID,
+          roleId: loginResponse.user.RoleID,
+        });
       } else {
         // For other roles, keep placeholder until specific endpoints are implemented
         onLogin({

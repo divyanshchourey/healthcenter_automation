@@ -266,11 +266,19 @@
       "linkedin": "https://linkedin.com/company/healthautomation",
       "instagram": "https://instagram.com/healthautomation"
     },
-    "newsletter": {
-      "title": "Stay Updated",
-      "subtitle": "Get the latest health center automation tips and updates delivered to your inbox",
-      "placeholder": "Enter your email address",
-      "buttonText": "Subscribe"
+    "creators": {
+      "title": "Created and maintained by:",
+      "names": [
+        "Divyansh Chourey",
+        "Chanchlesh Ravikiran",
+        "Devansh Singh Nikam",
+        "Palak Billore",
+        "Satyam Prajapati",
+        "Sawan Parmar"
+      ],
+      "links": {
+        "Divyansh Chourey": "https://divyansh-portfolio-2ff07.web.app/"
+      }
     }
   }
 }

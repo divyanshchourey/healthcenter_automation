@@ -51,12 +51,12 @@ export default function StaffForm() {
                         gender: userDetails.Gender || 'Male',
                         address: userDetails.Address || '',
                         dateOfBirth: formatDate(userDetails.DOB),
+                        aadharNumber: userDetails.AadharNumber || '',
                         division: profileData?.Division || '',
                         designation: profileData?.Designation || '',
                         ward: profileData?.Ward || '',
                         status: profileData?.Status || 'Active',
                         joinDate: formatDate(profileData?.JoinDate),
-                        aadharNumber: profileData?.AadharNumber || '',
                         panNumber: profileData?.PANNumber || '',
                         accountNumber: profileData?.AccountNumber || '',
                         IFSCCode: profileData?.IFSCCode || ''
@@ -88,14 +88,15 @@ export default function StaffForm() {
             if (!id || id === 'new') {
                 const registerPayload = {
                     FirstName: form.firstName,
-                    LastName: form.lastName,
+                    LastName: form.lastName || null,
                     Email: form.email,
                     Phone: form.phoneNumber,
                     Password: form.password || 'Staff@123', // Default if empty
                     RoleID: 4, // Staff
-                    Gender: form.gender,
-                    DOB: form.dateOfBirth,
-                    Address: form.address
+                    Gender: form.gender || null,
+                    DOB: form.dateOfBirth || null,
+                    AadharNumber: form.aadharNumber,
+                    Address: form.address || null
                 }
                 const registeredUser = await registerAccount(registerPayload)
                 userId = registeredUser.UserID || registeredUser.id
@@ -104,15 +105,15 @@ export default function StaffForm() {
 
             // Step 2: Create or Update Staff Profile
             const profilePayload = {
-                Division: form.division,
-                Designation: form.designation,
-                Ward: form.ward,
-                Status: form.status,
-                JoinDate: form.joinDate,
-                AadharNumber: form.aadharNumber,
-                PANNumber: form.panNumber,
-                AccountNumber: form.accountNumber,
-                IFSCCode: form.IFSCCode
+                EProfilePhoto: null,
+                Division: form.division || null,
+                Designation: form.designation || null,
+                Ward: form.ward || null,
+                Status: form.status || 'Active',
+                JoinDate: form.joinDate || null,
+                PANNumber: form.panNumber || null,
+                AccountNumber: form.accountNumber || null,
+                IFSCCode: form.IFSCCode || null
             }
 
             await createOrUpdateStaffProfile(userId, profilePayload)
@@ -235,7 +236,7 @@ export default function StaffForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm text-gray-600">Aadhar Number</label>
-                            <input className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.aadharNumber || ''} onChange={(e) => update('aadharNumber', e.target.value)} maxLength={12} />
+                            <input className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.aadharNumber || ''} onChange={(e) => update('aadharNumber', e.target.value)} maxLength={12} required />
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600">PAN Number</label>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getUser, getEmployeeProfile } from '../../services/apiService';
+import { getUser, getEmployeeProfile, getEmployeeProfileImage, uploadEmployeeProfileImage, createOrUpdateStaffProfile } from '../../services/apiService';
 
 const Profile = ({ user }) => {
   const [formData, setFormData] = useState({
     photoUrl: '',
+    photoFile: null,
     name: '',
     email: '',
     gender: '',
@@ -19,11 +20,13 @@ const Profile = ({ user }) => {
     ifscCode: ''
   });
   const [isSaved, setIsSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.userId) return;
       try {
+        setIsLoading(true);
         // Fetch personal details from User table
         const userDetails = await getUser(user.userId);
         
@@ -32,8 +35,18 @@ const Profile = ({ user }) => {
         try {
           employeeProfile = await getEmployeeProfile(user.userId);
         } catch (error) {
-          // Employee profile might not exist yet, that's okay
           console.log('Employee profile not found, will be created on save:', error);
+        }
+
+        // Fetch profile image from backend
+        let fetchedPhotoUrl = '';
+        try {
+          const imageRes = await getEmployeeProfileImage();
+          if (imageRes?.DownloadURL) {
+            fetchedPhotoUrl = imageRes.DownloadURL;
+          }
+        } catch (error) {
+          console.log('Failed to fetch profile image:', error);
         }
         
         const formatDateForInput = (value) => {
@@ -46,9 +59,6 @@ const Profile = ({ user }) => {
           }
         };
 
-        const photoKey = user?.userId ? `staff_photo_${user.userId}` : null;
-        const storedPhoto = photoKey ? window.localStorage.getItem(photoKey) : null;
-
         setFormData((prev) => ({
           ...prev,
           // Personal information from User table
@@ -58,11 +68,11 @@ const Profile = ({ user }) => {
           gender: userDetails?.Gender || '',
           address: userDetails?.Address || '',
           dateOfBirth: formatDateForInput(userDetails?.DOB),
-          photoUrl: storedPhoto || prev.photoUrl || '',
+          photoUrl: fetchedPhotoUrl || prev.photoUrl || '',
           // Professional information from Employees table
-          department: employeeProfile?.Division || '', // Map Division to department
-          joinDate: formatDateForInput(employeeProfile?.JoinDate), // Join date from backend
-          role: employeeProfile?.Designation || '', // Map Designation to role
+          department: employeeProfile?.Division || '',
+          joinDate: formatDateForInput(employeeProfile?.JoinDate),
+          role: employeeProfile?.Designation || '',
           // Financial information from Employees table
           aadharNumber: employeeProfile?.AadharNumber || '',
           panNumber: employeeProfile?.PANNumber || '',
@@ -71,6 +81,8 @@ const Profile = ({ user }) => {
         }));
       } catch (error) {
         console.error('Failed to fetch user data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -86,28 +98,69 @@ const Profile = ({ user }) => {
     setIsSaved(false);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    console.log('Saving profile:', formData);
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 3000);
+    if (!user?.userId) return;
+
+    try {
+      setIsLoading(true);
+      let finalPhotoUrl = formData.photoUrl;
+
+      // 1. Handle image upload if a new file was selected
+      if (formData.photoFile) {
+        try {
+          console.log('Uploading staff profile image...');
+          const uploadRes = await uploadEmployeeProfileImage(formData.photoFile);
+          if (uploadRes?.DownloadURL) {
+            finalPhotoUrl = uploadRes.DownloadURL;
+            setFormData(prev => ({ ...prev, photoUrl: finalPhotoUrl, photoFile: null }));
+            if (onPhotoUpdate) onPhotoUpdate(finalPhotoUrl);
+          }
+        } catch (error) {
+          console.error('Failed to upload profile image:', error);
+          alert('Failed to upload profile image. Details will be saved without the new photo.');
+        }
+      }
+
+      // 2. Save professional and financial details
+      const payload = {
+        EmployeeID: Number(user.userId),
+        Division: formData.department || '',
+        Designation: formData.role || '',
+        JoinDate: formData.joinDate || null,
+        AadharNumber: formData.aadharNumber || '',
+        PANNumber: formData.panNumber || '',
+        AccountNumber: formData.accountNumber || '',
+        IFSCCode: formData.ifscCode || ''
+      };
+
+      console.log('Saving staff profile:', payload);
+      await createOrUpdateStaffProfile(user.userId, payload);
+      
+      setIsSaved(true);
+      alert('Profile saved successfully!');
+      setTimeout(() => setIsSaved(false), 3000);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePhotoChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Preview
     const reader = new FileReader();
     reader.onloadend = () => {
       if (typeof reader.result === 'string') {
-        const photoUrl = reader.result;
         setFormData((prev) => ({
           ...prev,
-          photoUrl,
+          photoUrl: reader.result,
+          photoFile: file
         }));
-        if (user?.userId) {
-          window.localStorage.setItem(`staff_photo_${user.userId}`, photoUrl);
-        }
       }
     };
     reader.readAsDataURL(file);

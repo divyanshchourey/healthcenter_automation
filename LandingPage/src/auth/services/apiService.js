@@ -11,6 +11,14 @@ const buildUrl = (path) => {
   return `${API_BASE_URL}${path}`;
 };
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('access_token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+};
+
 const handleResponse = async (response) => {
   let data;
   try {
@@ -145,6 +153,40 @@ export const loginDoctorAccount = async ({ email, password }) => {
 
 // Login for staff members using general /auth/login and validate RoleID (same pattern as doctor)
 export const loginStaffAccount = async ({ email, password }) => {
+  const payload = {
+    Email: email,
+    Password: password,
+  };
+
+  const response = await fetch(buildUrl(API_ENDPOINTS.AUTH_LOGIN), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return handleResponse(response);
+};
+
+export const loginAdminAccount = async ({ email, password }) => {
+  const payload = {
+    Email: email,
+    Password: password,
+  };
+
+  const response = await fetch(buildUrl(API_ENDPOINTS.AUTH_LOGIN), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return handleResponse(response);
+};
+
+export const loginLabCenterAccount = async ({ email, password }) => {
   const payload = {
     Email: email,
     Password: password,
@@ -345,9 +387,7 @@ export const bookAppointment = async (data) => {
   const url = buildUrl(API_ENDPOINTS.BOOK_APPOINTMENT);
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -358,9 +398,17 @@ export const getPatientAppointments = async (userId) => {
   const url = buildUrl(API_ENDPOINTS.GET_PATIENT_APPOINTMENTS(userId));
   const response = await fetch(url, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
+  });
+
+  return handleResponse(response);
+};
+
+export const getPatientCategorizedAppointments = async (userId) => {
+  const url = buildUrl(API_ENDPOINTS.GET_CATEGORIZED_APPOINTMENTS(userId));
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
   });
 
   return handleResponse(response);
@@ -409,13 +457,11 @@ export const getAllLabCenters = async () => {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
     const data = await handleResponse(response);
 
-    // Check if data is empty (Array or {data: []})
+    // If data is empty, using mock data fallback
     const items = Array.isArray(data) ? data : (data?.data || []);
     if (items.length === 0) {
       console.log('API returned no lab centers, using mock data fallback');
@@ -423,7 +469,7 @@ export const getAllLabCenters = async () => {
     }
     return data;
   } catch (error) {
-    console.error('Failed to fetch lab centers, using mock data fallback:', error);
+    console.error('Failed to fetch lab centers from ' + url + ', using mock data fallback:', error);
     return defaultLabCenters;
   }
 };
@@ -433,25 +479,61 @@ export const getLabCenterById = async (id) => {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
     return await handleResponse(response);
   } catch (error) {
     console.error(`Failed to fetch lab center ${id}, using mock data fallback:`, error);
-    return defaultLabCenters.find(l => l.id === id) || null;
+    return defaultLabCenters.find(l => (l.id || l.LabID) === id) || null;
   }
 };
 
 export const createLabCenter = async (data) => {
   const url = buildUrl(API_ENDPOINTS.CREATE_LAB_CENTER);
+  
+  // Map frontend fields (lowercase) to backend schema (PascalCase)
+  const payload = {
+    Name: data.name || data.Name,
+    Address: data.address || data.Address,
+    Contact: data.contact || data.Contact,
+    AccreditationNumber: data.accreditationNumber || data.AccreditationNumber || null,
+    ApprovedByAdmin: data.approvedByAdmin ?? data.ApprovedByAdmin ?? false,
+    OwnerEmail: data.ownerEmail || data.OwnerEmail,
+    OwnerPassword: data.ownerPassword || data.OwnerPassword,
+    OwnerFirstName: data.ownerFirstName || data.OwnerFirstName,
+    OwnerLastName: data.ownerLastName || data.OwnerLastName,
+    OwnerPhone: data.ownerPhone || data.OwnerPhone,
+    OwnerAadharNumber: data.ownerAadharNumber || data.OwnerAadharNumber
+  };
+
+  console.log("createLabCenter payload:", JSON.stringify(payload, null, 2));
+
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const result = await handleResponse(response);
+  console.log("createLabCenter response:", result);
+  return result;
+};
+
+export const updateLabCenter = async (id, data) => {
+  const url = buildUrl(API_ENDPOINTS.UPDATE_LAB_CENTER(id));
+  
+  // Map frontend fields (lowercase) to backend schema (PascalCase)
+  const payload = {
+    Name: data.name || data.Name,
+    Address: data.address || data.Address,
+    Contact: data.contact || data.Contact,
+    AccreditationNumber: data.accreditationNumber || data.AccreditationNumber || null,
+    ApprovedByAdmin: data.approvedByAdmin ?? data.ApprovedByAdmin ?? false
+  };
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
   });
   return handleResponse(response);
 };
@@ -460,9 +542,221 @@ export const deleteLabCenter = async (id) => {
   const url = buildUrl(API_ENDPOINTS.DELETE_LAB_CENTER(id));
   const response = await fetch(url, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const getPatientAvailableLabs = async () => {
+  const url = buildUrl(API_ENDPOINTS.GET_PATIENT_LABS);
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const bookLabTest = async (labId, data) => {
+  const url = buildUrl(API_ENDPOINTS.BOOK_LAB_TEST(labId));
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(response);
+};
+
+export const getPatientLabBookings = async (userId) => {
+  const url = buildUrl(API_ENDPOINTS.GET_PATIENT_LAB_BOOKINGS(userId));
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const uploadDoctorProfileImage = async (file) => {
+  const url = buildUrl(API_ENDPOINTS.UPLOAD_DOCTOR_PROFILE_IMAGE);
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const token = localStorage.getItem('access_token');
+  const headers = {
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    // Note: Don't set 'Content-Type': 'multipart/form-data', 
+    // fetch will automatically set it with the correct boundary
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: formData,
+  });
+
+  return handleResponse(response);
+};
+
+export const getDoctorProfileImage = async () => {
+  const url = buildUrl(API_ENDPOINTS.GET_DOCTOR_PROFILE_IMAGE);
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const uploadEmployeeProfileImage = async (file) => {
+  const url = buildUrl(API_ENDPOINTS.UPLOAD_EMPLOYEE_PROFILE_IMAGE);
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const token = localStorage.getItem('access_token');
+  const headers = {
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: formData,
+  });
+
+  return handleResponse(response);
+};
+
+export const getEmployeeProfileImage = async () => {
+  const url = buildUrl(API_ENDPOINTS.GET_EMPLOYEE_PROFILE_IMAGE);
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const uploadPrescription = async (appointmentId, file) => {
+  // Assuming a similar pattern for prescriptions if the backend supports it.
+  // For now, implementing as a generic upload or mock if unknown.
+  const url = buildUrl(`/employee/appointments/${appointmentId}/prescription`);
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const token = localStorage.getItem('access_token');
+  const headers = {
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: formData,
+  });
+
+  return handleResponse(response);
+};
+
+export const getBillDetails = async (appointmentId) => {
+  const url = buildUrl(API_ENDPOINTS.GET_BILL_DETAILS(appointmentId));
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const generateBill = async (appointmentId) => {
+  const url = buildUrl(API_ENDPOINTS.GENERATE_BILL(appointmentId));
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const payBill = async (appointmentId, paymentData) => {
+  const url = buildUrl(API_ENDPOINTS.PAY_BILL(appointmentId));
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(paymentData),
+  });
+  return handleResponse(response);
+};
+
+export const getLabBookings = async (labId, filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+  if (filters.date) params.append('date', filters.date);
+  
+  const url = buildUrl(API_ENDPOINTS.LAB_BOOKING_LIST(labId) + (params.toString() ? '?' + params.toString() : ''));
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const updateLabBookingStatus = async (labId, bookingId, status) => {
+  const url = buildUrl(API_ENDPOINTS.UPDATE_LAB_BOOKING_STATUS(labId, bookingId));
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  return handleResponse(response);
+};
+
+export const uploadLabResult = async (labId, bookingId, file) => {
+  const url = buildUrl(API_ENDPOINTS.UPLOAD_LAB_RESULT(labId, bookingId));
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const token = localStorage.getItem('access_token');
+  const headers = {
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: formData,
+  });
+  return handleResponse(response);
+};
+
+export const generateLabBill = async (labId, bookingId, data) => {
+  const url = buildUrl(API_ENDPOINTS.GENERATE_LAB_BILL(labId, bookingId));
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(response);
+};
+
+export const payLabBill = async (labId, bookingId, paymentData) => {
+  const url = buildUrl(API_ENDPOINTS.PAY_LAB_BILL(labId, bookingId));
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(paymentData),
+  });
+  return handleResponse(response);
+};
+
+export const getPrescriptionUrl = async (documentId) => {
+  const url = buildUrl(API_ENDPOINTS.GET_PRESCRIPTION_URL(documentId));
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const getPatientPrescriptions = async () => {
+  const url = buildUrl(API_ENDPOINTS.GET_PATIENT_PRESCRIPTIONS);
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
   });
   return handleResponse(response);
 };

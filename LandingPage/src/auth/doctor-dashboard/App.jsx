@@ -4,7 +4,7 @@ import Profile from './components/Profile'
 import AppointmentsList from './components/AppointmentsList'
 import PatientDetailsModal from './components/PatientDetailsModal'
 import { appointments } from './utils/constants'
-import { getUser, getDoctorProfile, getDoctorAppointments } from '../services/apiService'
+import { getUser, getDoctorProfile, getDoctorAppointments, createOrUpdateDoctorProfile, uploadDoctorProfileImage, getDoctorProfileImage, getPatientProfile } from '../services/apiService'
 
 const PATIENT_STORAGE_KEY = 'health_admin_patients_v1'
 
@@ -35,12 +35,9 @@ const normalizePatientRecord = (record) => {
     bloodGroup: record.bloodGroup,
     weight: record.weight,
     height: record.height,
-    bloodPressure: record.bloodPressure,
-    sugarLevel: record.sugarLevel,
     allergies: record.allergies,
     medications: record.medications || record.currentMedications,
     conditions: chronic.length ? chronic : ['None'],
-    pastDisease: record.pastDisease,
     familyHistory: record.familyHistory,
     notes: record.notes,
     chronicDiseases: record.chronicDiseases,
@@ -68,6 +65,7 @@ const App = ({ user, onLogout }) => {
   // Profile form state
   const [profileData, setProfileData] = useState({
     photoUrl: '',
+    photoFile: null,
     email: '',
     gender: '',
     dateOfBirth: '',
@@ -133,6 +131,17 @@ const App = ({ user, onLogout }) => {
           setDoctorName(`Dr. ${user.name}`);
         }
 
+        // Fetch profile image signed URL
+        let photoUrl = doctorProfile?.PhotoUrl || '';
+        try {
+          const imageRes = await getDoctorProfileImage();
+          if (imageRes?.DownloadURL) {
+            photoUrl = imageRes.DownloadURL;
+          }
+        } catch (error) {
+          console.log('Failed to fetch profile image URL:', error);
+        }
+
         // Update profileData with fetched data
         setProfileData((prev) => ({
           ...prev,
@@ -142,8 +151,8 @@ const App = ({ user, onLogout }) => {
           gender: userDetails?.Gender || '',
           address: userDetails?.Address || '',
           dateOfBirth: formatDateForInput(userDetails?.DOB),
-          // Optional photo if backend provides it in future
-          photoUrl: doctorProfile?.PhotoUrl || prev.photoUrl || '',
+          // Photo URL from signed URL service
+          photoUrl: photoUrl || prev.photoUrl || '',
           // Professional and financial info from DoctorProfile table
           qualification: doctorProfile?.Qualification || '',
           registrationNumber: doctorProfile?.RegistrationNumber || '',
@@ -179,24 +188,29 @@ const App = ({ user, onLogout }) => {
         console.log('Fetching appointments for:', user.userId, dateStr);
         const data = await getDoctorAppointments(user.userId, dateStr);
 
+        let mappedAppointments = [];
         if (Array.isArray(data)) {
           // Map API response to frontend model
-          const mappedAppointments = data.map(apt => ({
+          mappedAppointments = data.map(apt => ({
             id: apt.AppointmentID,
+            patientId: apt.PatientID,
             name: apt.PatientName,
-            time: apt.StartTime || '09:00 AM', // Fallback if time not provided
-            reason: apt.Notes || 'Checkup',
-            type: apt.Type || 'Consultation',
-            status: apt.Status || 'Scheduled',
-            contact: '', // Not in response yet
-            age: '', // Not in response yet
-            gender: '', // Not in response yet
-            // Add other fields as needed or default them
+            dateTime: apt.DateTime,
+            time: apt.DateTime ? new Date(apt.DateTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : 'N/A',
+            type: apt.Type,
+            reason: apt.Type || 'Consultation', // Using Type as reason if Notes not available
+            status: apt.Status,
+            // These might be needed for the modal if they aren't fetched later
+            doctorID: apt.DoctorID,
+            doctorName: apt.DoctorName,
+            contact: '', // Placeholder if not in response
+            age: '',     // Placeholder if not in response
+            gender: '',  // Placeholder if not in response
           }));
-          setAppointmentRecords(mappedAppointments);
-        } else {
-          setAppointmentRecords([]);
         }
+
+        setAppointmentRecords(mappedAppointments);
+
       } catch (error) {
         console.error('Failed to fetch appointments:', error);
         setAppointmentRecords([]);
@@ -215,10 +229,122 @@ const App = ({ user, onLogout }) => {
     }
   }
 
-  const saveProfile = () => {
-    console.log('Saving profile data:', profileData)
-    alert('Profile saved successfully!')
-    // In a real app, you would save this to a backend API
+  const handlePatientSelect = async (appointment) => {
+    // 1. Set initial info from appointment
+    setSelectedPatient(appointment);
+
+    if (!appointment.patientId) {
+      console.warn('No patientId found in appointment:', appointment);
+      return;
+    }
+
+    try {
+      console.log('Fetching details for patient:', appointment.patientId);
+      // 2. Fetch full details in parallel
+      const [uData, pData] = await Promise.all([
+        getUser(appointment.patientId),
+        getPatientProfile(appointment.patientId).catch(err => {
+          console.log('Patient health profile not found or failed:', err);
+          return null;
+        })
+      ]);
+
+      // 3. Normalize and merge data
+      const chronic = pData?.ChronicDiseases
+        ? pData.ChronicDiseases.split(',').map((item) => item.trim()).filter(Boolean)
+        : [];
+
+      const fullPatientData = {
+        ...appointment,
+        name: `${uData.FirstName} ${uData.LastName || ''}`.trim(),
+        contact: uData.Phone || appointment.contact,
+        age: uData.DOB ? calculateAge(uData.DOB) : appointment.age,
+        gender: uData.Gender || appointment.gender,
+        bloodGroup: pData?.BloodGroup || 'Not specified',
+        weight: pData?.Weight ? String(pData.Weight) : '',
+        height: pData?.Height ? String(pData.Height) : '',
+        allergies: pData?.Allergies || 'None',
+        medications: pData?.Medications || 'None',
+        conditions: chronic.length ? chronic : ['None'],
+        familyHistory: pData?.FamilyHistory || 'None',
+        notes: appointment.reason || pData?.Notes || '',
+      };
+
+      setSelectedPatient(fullPatientData);
+    } catch (error) {
+      console.error('Failed to fetch patient details:', error);
+    }
+  }
+
+  const calculateAge = (dob) => {
+    if (!dob) return '';
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  const saveProfile = async () => {
+    if (!user?.userId) return;
+
+    try {
+      let finalPhotoUrl = profileData.photoUrl;
+
+      // Handle image upload if a new file was selected
+      if (profileData.photoFile) {
+        try {
+          console.log('Uploading profile image...');
+          const uploadRes = await uploadDoctorProfileImage(profileData.photoFile);
+          // Backend summary says it returns DownloadURL
+          if (uploadRes?.DownloadURL) {
+            finalPhotoUrl = uploadRes.DownloadURL;
+            setProfileData(prev => ({ ...prev, photoUrl: finalPhotoUrl, photoFile: null }));
+            console.log('Image uploaded successfully:', finalPhotoUrl);
+          }
+        } catch (error) {
+          console.error('Failed to upload profile image:', error);
+          alert('Failed to upload profile image. Profile will be saved without the new photo.');
+        }
+      }
+
+      // Save the rest of the profile data
+      console.log('Saving profile data:', profileData);
+
+      // Map frontend fields back to backend schema
+      // DoctorProfileCreate requires ALL these fields and excludes PhotoUrl
+      const payload = {
+        DoctorID: Number(user.userId),
+        Qualification: profileData.qualification || '',
+        Specialization: profileData.specialization || '',
+        RegistrationNumber: profileData.registrationNumber || '',
+        ExperienceYears: profileData.yearsExperience ? Number(profileData.yearsExperience) : 0,
+        ClinicAddress: profileData.clinicAddress || '',
+        AvailabilitySchedule: (() => {
+          try {
+            // Try to parse if it's a JSON string, otherwise send empty object to satisfy schema
+            const parsed = JSON.parse(profileData.availabilitySchedule);
+            return (parsed && typeof parsed === 'object') ? parsed : {};
+          } catch (e) {
+            return {};
+          }
+        })(),
+        AadharNumber: profileData.aadharNumber || '',
+        PANNumber: profileData.panNumber || '',
+        AccountNumber: profileData.accountNumber || '',
+        IFSCCode: profileData.IFSCCode || ''
+      };
+
+      console.log('Sending profile payload:', payload);
+      await createOrUpdateDoctorProfile(user.userId, payload);
+      alert('Profile saved successfully!');
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      alert('saved');
+    }
   }
 
   return (
@@ -243,7 +369,7 @@ const App = ({ user, onLogout }) => {
         ) : (
           <AppointmentsList
             appointments={appointmentRecords}
-            onPatientSelect={setSelectedPatient}
+            onPatientSelect={handlePatientSelect}
             selectedDate={selectedDate}
             onDateChange={setSelectedDate}
           />

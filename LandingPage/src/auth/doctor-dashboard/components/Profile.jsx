@@ -5,6 +5,7 @@ const Profile = ({ profileData, onProfileChange, onSave }) => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // Preview
     const reader = new FileReader()
     reader.onloadend = () => {
       if (typeof reader.result === 'string') {
@@ -12,6 +13,9 @@ const Profile = ({ profileData, onProfileChange, onSave }) => {
       }
     }
     reader.readAsDataURL(file)
+
+    // Store file object for upload
+    onProfileChange('photoFile', file)
   }
 
   return (

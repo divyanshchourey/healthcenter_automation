@@ -40,9 +40,9 @@ export default function LabCenterDetails() {
 
             <div className="bg-white rounded-xl shadow-soft overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-8 text-white">
-                    <h1 className="text-3xl font-bold">{center.name}</h1>
+                    <h1 className="text-3xl font-bold">{center.Name || center.name}</h1>
                     <p className="mt-2 text-blue-100 flex items-center gap-2">
-                        <span className="opacity-70">Lab ID:</span> {center.id}
+                        <span className="opacity-70">Lab ID:</span> {center.LabID || center.id}
                     </p>
                 </div>
 
@@ -53,11 +53,11 @@ export default function LabCenterDetails() {
                             <div className="space-y-3">
                                 <div className="flex items-start gap-3 text-gray-800">
                                     <span className="font-semibold w-24">Address:</span>
-                                    <span className="flex-1">{center.address}</span>
+                                    <span className="flex-1">{center.Address || center.address}</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-gray-800">
                                     <span className="font-semibold w-24">Phone:</span>
-                                    <span>{center.contact}</span>
+                                    <span>{center.Contact || center.contact}</span>
                                 </div>
                             </div>
                         </div>
@@ -67,7 +67,7 @@ export default function LabCenterDetails() {
                             <div className="flex items-center gap-3">
                                 <span className="font-semibold w-24">Accreditation:</span>
                                 <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-bold border border-blue-100">
-                                    {center.accreditationNumber}
+                                    {center.AccreditationNumber || center.accreditationNumber}
                                 </span>
                             </div>
                         </div>
@@ -79,7 +79,7 @@ export default function LabCenterDetails() {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <span className="font-semibold w-24">Status:</span>
-                                    {center.approvedByAdmin ? (
+                                    {(center.ApprovedByAdmin ?? center.approvedByAdmin) ? (
                                         <span className="flex items-center gap-1.5 text-green-700 font-bold bg-green-50 px-3 py-1 rounded-full border border-green-100 text-sm">
                                             Approved
                                         </span>
@@ -91,7 +91,7 @@ export default function LabCenterDetails() {
                                 </div>
                                 <div className="flex items-center gap-3 text-gray-600 text-sm">
                                     <span className="font-semibold w-24">Registered:</span>
-                                    <span>{new Date(center.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                    <span>{new Date(center.CreatedAt || center.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                 </div>
                             </div>
                         </div>

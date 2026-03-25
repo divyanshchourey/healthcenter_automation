@@ -26,7 +26,7 @@ export default function LabCentersList() {
         if (window.confirm('Are you sure you want to delete this lab center?')) {
             try {
                 await deleteLabCenter(id)
-                setItems(items.filter(item => item.id !== id))
+                setItems(items.filter(item => (item.id || item.LabID) !== id))
             } catch (err) {
                 console.error('Failed to delete lab center:', err)
                 alert('Failed to delete lab center')
@@ -70,38 +70,47 @@ export default function LabCentersList() {
                                 <td colSpan="7" className="py-10 text-center text-gray-500">No lab centers found.</td>
                             </tr>
                         ) : (
-                            items.map((l) => (
-                                <tr key={l.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="py-3 px-4 font-medium text-blue-600">{l.id}</td>
-                                    <td className="py-3 px-4 font-semibold">{l.name}</td>
-                                    <td className="py-3 px-4 text-gray-600">{l.address}</td>
-                                    <td className="py-3 px-4 text-gray-600">{l.contact}</td>
-                                    <td className="py-3 px-4">
-                                        <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-                                            {l.accreditationNumber}
-                                        </span>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        {l.approvedByAdmin ? (
-                                            <span className="bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-medium border border-green-100">Approved</span>
-                                        ) : (
-                                            <span className="bg-yellow-50 text-yellow-700 px-2 py-1 rounded text-xs font-medium border border-yellow-100">Pending</span>
-                                        )}
-                                    </td>
-                                    <td className="py-3 px-4 text-right">
-                                        <div className="flex gap-3 justify-end items-center">
-                                            <Link to={`/admin/dashboard/lab-centers/${l.id}`} className="text-blue-600 hover:underline font-medium">View</Link>
-                                            <Link to={`/admin/dashboard/lab-centers/${l.id}/edit`} className="text-gray-600 hover:underline font-medium">Edit</Link>
-                                            <button
-                                                onClick={() => handleDelete(l.id)}
-                                                className="text-red-600 hover:text-red-800 transition-colors font-medium"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
+                            items.map((l) => {
+                                const id = l.LabID || l.id;
+                                const name = l.Name || l.name;
+                                const address = l.Address || l.address;
+                                const contact = l.Contact || l.contact;
+                                const accreditation = l.AccreditationNumber || l.accreditationNumber;
+                                const approved = l.ApprovedByAdmin ?? l.approvedByAdmin;
+
+                                return (
+                                    <tr key={id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="py-3 px-4 font-medium text-blue-600">{id}</td>
+                                        <td className="py-3 px-4 font-semibold">{name}</td>
+                                        <td className="py-3 px-4 text-gray-600">{address}</td>
+                                        <td className="py-3 px-4 text-gray-600">{contact}</td>
+                                        <td className="py-3 px-4">
+                                            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                                                {accreditation}
+                                            </span>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            {approved ? (
+                                                <span className="bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-medium border border-green-100">Approved</span>
+                                            ) : (
+                                                <span className="bg-yellow-50 text-yellow-700 px-2 py-1 rounded text-xs font-medium border border-yellow-100">Pending</span>
+                                            )}
+                                        </td>
+                                        <td className="py-3 px-4 text-right">
+                                            <div className="flex gap-3 justify-end items-center">
+                                                <Link to={`/admin/dashboard/lab-centers/${id}`} className="text-blue-600 hover:underline font-medium">View</Link>
+                                                {/* <Link to={`/admin/dashboard/lab-centers/${id}/edit`} className="text-gray-600 hover:underline font-medium">Edit</Link> */}
+                                                <button
+                                                    onClick={() => handleDelete(id)}
+                                                    className="text-red-600 hover:text-red-800 transition-colors font-medium"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         )}
                     </tbody>
                 </table>

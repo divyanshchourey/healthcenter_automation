@@ -2,18 +2,34 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Patients from './components/Patients';
 import Profile from './components/Profile';
-import UploadPrescription from './components/UploadPrescription';
 import Billing from './components/Billing';
-import { getEmployeeAppointments, deleteAppointment } from '../services/apiService';
+import { getEmployeeAppointments, deleteAppointment, getEmployeeProfileImage } from '../services/apiService';
 
 const StaffDashboard = ({ user, onLogout }) => {
   const [currentView, setCurrentView] = useState('patients');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [staffPhoto, setStaffPhoto] = useState('');
 
   // Appointment state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [appointments, setAppointments] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
+
+  // Fetch staff profile photo
+  useEffect(() => {
+    const fetchProfilePhoto = async () => {
+      if (!user?.userId) return;
+      try {
+        const imageRes = await getEmployeeProfileImage();
+        if (imageRes?.DownloadURL) {
+          setStaffPhoto(imageRes.DownloadURL);
+        }
+      } catch (error) {
+        console.log('Failed to fetch staff profile photo:', error);
+      }
+    };
+    fetchProfilePhoto();
+  }, [user?.userId]);
 
   // Fetch appointments
   const fetchAppointments = async () => {
@@ -26,7 +42,7 @@ const StaffDashboard = ({ user, onLogout }) => {
           id: apt.AppointmentID,
           name: apt.PatientName,
           doctorName: apt.DoctorName,
-          time: apt.StartTime || '09:00 AM',
+          time: apt.DateTime ? new Date(apt.DateTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : (apt.StartTime || '09:00 AM'),
           reason: apt.Notes || 'Checkup',
           type: apt.Type || 'Consultation',
           status: apt.Status || 'Scheduled',
@@ -67,6 +83,7 @@ const StaffDashboard = ({ user, onLogout }) => {
         onLogout={onLogout}
         isExpanded={isSidebarExpanded}
         setIsExpanded={setIsSidebarExpanded}
+        staffPhoto={staffPhoto}
       />
       <main className="flex-1 p-10 overflow-auto">
         {currentView === 'patients' && (
@@ -82,20 +99,10 @@ const StaffDashboard = ({ user, onLogout }) => {
         )}
         {currentView === 'profile' && (
           <div className="max-w-5xl mx-auto">
-            <Profile user={user} />
-          </div>
-        )}
-        {currentView === 'uploadPrescription' && (
-          <div className="max-w-5xl mx-auto">
-            <UploadPrescription
-              appointments={appointments}
-              selectedDate={selectedDate}
+            <Profile 
+              user={user} 
+              onPhotoUpdate={(newPhoto) => setStaffPhoto(newPhoto)}
             />
-          </div>
-        )}
-        {currentView === 'billing' && (
-          <div className="max-w-6xl mx-auto">
-            <Billing />
           </div>
         )}
       </main>

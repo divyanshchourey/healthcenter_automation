@@ -63,11 +63,10 @@ export default function AppointmentDetails() {
                     <Info label="Blood Group" value={item.bloodGroup} />
                     <Info label="Weight" value={`${item.weight} kg`} />
                     <Info label="Height" value={`${item.height} cm`} />
-                    <Info label="Blood Pressure" value={item.bloodPressure} />
-                    <Info label="Sugar Level" value={`${item.sugarLevel} mg/dL`} />
+
                     <Info label="Allergies" value={item.allergies} />
                     <Info label="Chronic Diseases" value={item.chronicDiseases} />
-                    <Info label="Past Disease" value={item.pastDisease} />
+
                     <Info label="Family History" value={item.familyHistory} />
                     <Info label="Medications" value={item.medications} />
                 </div>

@@ -1,16 +1,6 @@
 import React, { useState } from "react";
 
 const Footer = ({ data }) => {
-  const [email, setEmail] = useState("");
-
-  const handleNewsletterSubmit = (e) => {
-    e.preventDefault();
-    // Handle newsletter subscription
-    console.log("Newsletter subscription:", email);
-    alert("Thank you for subscribing to our newsletter!");
-    setEmail("");
-  };
-
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -23,7 +13,7 @@ const Footer = ({ data }) => {
               {data.description}
             </p>
             {/* Social Media */}
-            
+
           </div>
 
           {/* Quick Links */}
@@ -65,31 +55,27 @@ const Footer = ({ data }) => {
             </ul>
           </div>
 
-          {/* Newsletter Signup */}
+          {/* Creators Section */}
           <div className="lg:col-span-2">
             <h4 className="text-lg font-semibold mb-4">
-              {data.newsletter.title}
+              {data.creators.title}
             </h4>
-            <p className="text-gray-400 mb-6">{data.newsletter.subtitle}</p>
-            <form
-              onSubmit={handleNewsletterSubmit}
-              className="flex flex-col sm:flex-row gap-3"
-            >
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={data.newsletter.placeholder}
-                className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-              >
-                {data.newsletter.buttonText}
-              </button>
-            </form>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+              {data.creators.names.map((name, index) => {
+                const link = data.creators.links?.[name];
+                return (
+                  <div key={index} className="text-gray-400 hover:text-white transition-colors duration-200">
+                    {link ? (
+                      <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                        {name}
+                      </a>
+                    ) : (
+                      name
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -97,7 +83,7 @@ const Footer = ({ data }) => {
         <div className="mt-12 pt-8 border-t border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 {data.companyName}. All rights reserved.
+              © 2026 {data.companyName}. All rights reserved.
             </p>
             <p className="text-gray-400 text-sm mt-2 md:mt-0">
               Made with ❤️ for better health
