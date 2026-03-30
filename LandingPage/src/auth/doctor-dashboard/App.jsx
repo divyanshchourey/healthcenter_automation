@@ -61,6 +61,7 @@ const App = ({ user, onLogout }) => {
 
   const [appointmentRecords, setAppointmentRecords] = useState([])
   const [doctorName, setDoctorName] = useState('Dr. User')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   // Profile form state
   const [profileData, setProfileData] = useState({
@@ -348,7 +349,23 @@ const App = ({ user, onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row overflow-hidden">
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-blue-600 text-white shadow-md z-30">
+        <div className="flex items-center gap-2">
+          <div className="bg-white p-1 rounded-lg">
+            <ClipboardList className="w-6 h-6 text-blue-600" />
+          </div>
+          <span className="font-bold text-lg leading-tight tracking-tight">HealthCenter</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
       {/* Left Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -356,10 +373,12 @@ const App = ({ user, onLogout }) => {
         doctorName={doctorName}
         doctorPhoto={profileData.photoUrl}
         onLogout={onLogout}
+        isMobileOpen={isSidebarOpen}
+        setIsMobileOpen={setIsSidebarOpen}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-white">
+      <div className="flex-1 bg-white overflow-auto p-4 md:p-6">
         {activeTab === 'profile' ? (
           <Profile
             profileData={profileData}

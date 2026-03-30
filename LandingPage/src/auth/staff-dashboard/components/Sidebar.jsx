@@ -17,11 +17,20 @@ const Sidebar = ({ currentView, setCurrentView, user, onLogout, isExpanded, setI
     .toUpperCase();
 
   return (
-    <div
-      className={`bg-gradient-to-b from-blue-600 to-blue-700 text-white p-6 transition-all duration-300 shadow-md border-r border-blue-400 flex flex-col ${
-        isExpanded ? 'w-64' : 'w-24'
-      }`}
-    >
+    <>
+      {/* Mobile Backdrop */}
+      {isExpanded && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+
+      <div
+        className={`bg-gradient-to-b from-blue-600 to-blue-700 text-white p-6 transition-all duration-300 shadow-md border-r border-blue-400 flex flex-col fixed inset-y-0 left-0 z-50 md:relative transform ${
+          isExpanded ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0 md:w-24'
+        } transition-transform duration-300 ease-in-out`}
+      >
       {/* Header Profile Section */}
       <div className="mb-10">
         <div className="flex items-center justify-between mb-6">
@@ -73,7 +82,10 @@ const Sidebar = ({ currentView, setCurrentView, user, onLogout, isExpanded, setI
 
       <nav className="space-y-3 flex-1 text-center">
         <button
-          onClick={() => setCurrentView('profile')}
+          onClick={() => {
+            setCurrentView('profile');
+            if (window.innerWidth < 768) setIsExpanded(false);
+          }}
           className={`w-full py-3 px-4 rounded-xl font-medium transition-all flex items-center gap-3 ${
             currentView === 'profile'
               ? 'bg-white text-blue-700 shadow-md'
@@ -86,7 +98,10 @@ const Sidebar = ({ currentView, setCurrentView, user, onLogout, isExpanded, setI
         </button>
 
         <button
-          onClick={() => setCurrentView('patients')}
+          onClick={() => {
+            setCurrentView('patients');
+            if (window.innerWidth < 768) setIsExpanded(false);
+          }}
           className={`w-full py-3 px-4 rounded-xl font-medium transition-all flex items-center gap-3 ${
             currentView === 'patients'
               ? 'bg-white text-blue-700 shadow-md'
@@ -112,7 +127,8 @@ const Sidebar = ({ currentView, setCurrentView, user, onLogout, isExpanded, setI
           {isExpanded && <span>Logout</span>}
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

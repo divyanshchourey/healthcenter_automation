@@ -18,6 +18,7 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
     specialization: '',
     licenseNumber: '',
     emergencyContact: '',
+    aadharNumber: '',
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -55,6 +56,7 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
           dateOfBirth: formData.dateOfBirth,
           gender: formData.gender,
           address: formData.address,
+          aadharNumber: formData.aadharNumber,
         });
 
         let finalUserId = response?.user?.UserID || response?.UserID || response?.id;
@@ -325,6 +327,27 @@ const RegisterPage = ({ role, onBack, onRegister, onRoleSelection }) => {
                     }`}
                   placeholder="Emergency contact number"
                 />
+              </div>
+            )}
+
+            {roleConfig.extraFields.includes('aadharNumber') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Aadhar Number
+                </label>
+                <input
+                  type="text"
+                  name="aadharNumber"
+                  value={formData.aadharNumber}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.aadharNumber ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  placeholder="Enter 12-digit Aadhar number"
+                  maxLength={12}
+                />
+                {errors.aadharNumber && (
+                  <p className="text-xs text-red-600">{errors.aadharNumber}</p>
+                )}
               </div>
             )}
 

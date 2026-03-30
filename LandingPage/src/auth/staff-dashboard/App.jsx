@@ -4,6 +4,7 @@ import Patients from './components/Patients';
 import Profile from './components/Profile';
 import Billing from './components/Billing';
 import { getEmployeeAppointments, deleteAppointment, getEmployeeProfileImage } from '../services/apiService';
+import { Menu, Users } from 'lucide-react';
 
 const StaffDashboard = ({ user, onLogout }) => {
   const [currentView, setCurrentView] = useState('patients');
@@ -75,7 +76,22 @@ const StaffDashboard = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white flex-col md:flex-row overflow-hidden">
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-blue-600 text-white shadow-md z-30">
+        <div className="flex items-center gap-2">
+          <div className="bg-white p-1 rounded-lg">
+            <Users className="w-6 h-6 text-blue-600" />
+          </div>
+          <span className="font-bold text-lg leading-tight tracking-tight">StaffPortal</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarExpanded(true)}
+          className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
       <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -85,7 +101,7 @@ const StaffDashboard = ({ user, onLogout }) => {
         setIsExpanded={setIsSidebarExpanded}
         staffPhoto={staffPhoto}
       />
-      <main className="flex-1 p-10 overflow-auto">
+      <main className="flex-1 p-4 md:p-10 overflow-auto pt-4 md:pt-10">
         {currentView === 'patients' && (
           <div className="max-w-6xl mx-auto">
             <Patients

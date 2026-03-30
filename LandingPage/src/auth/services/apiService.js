@@ -51,6 +51,7 @@ export const registerPatientAccount = async ({
   dateOfBirth,
   gender,
   address,
+  aadharNumber,
 }) => {
   const normalizedPhone = String(phone ?? '').replace(/\D/g, '');
 
@@ -64,6 +65,7 @@ export const registerPatientAccount = async ({
     Gender: gender || null,
     DOB: dateOfBirth || null,
     Address: address || null,
+    AadharNumber: aadharNumber || null,
   };
 
   const response = await fetch(buildUrl(API_ENDPOINTS.AUTH_REGISTER), {

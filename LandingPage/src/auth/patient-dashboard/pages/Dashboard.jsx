@@ -8,6 +8,7 @@ import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientCat
 export default function Dashboard({ user, onLogout }) {
   const [activeMenu, setActiveMenu] = useState("Profile");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [patientName, setPatientName] = useState(user?.name || "Patient");
   const [appointments, setAppointments] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -583,37 +584,66 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white overflow-hidden">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-blue-600 flex items-center justify-between px-4 z-40 shadow-md text-white">
+        <div className="flex items-center gap-2">
+          <div className="bg-white p-1 rounded-lg">
+            <ClipboardList className="w-6 h-6 text-blue-600" />
+          </div>
+          <span className="font-bold text-lg">HealthCenter</span>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Sidebar Backdrop (Mobile) */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <div
-        className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white p-6 transition-all duration-300 shadow-md border rounded-lg flex flex-col ${isSidebarExpanded ? "w-64" : "w-20"
-          }`}
+        className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white p-6 transition-all duration-300 shadow-md border rounded-r-lg flex flex-col fixed inset-y-0 left-0 z-50 md:relative ${
+          isSidebarExpanded ? "w-64" : "w-20"
+        } ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} transition-transform duration-300 ease-in-out`}
       >
         <div className="flex justify-between items-center mb-10">
-          {isSidebarExpanded && (
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              {isSidebarExpanded ? (
                 <div>
                   <h2 className="text-lg font-semibold">Welcome Back,</h2>
                   <h1 className="text-xl font-bold">{patientName}</h1>
                 </div>
-                <button
-                  onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-                  className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
-                >
-                  <X size={22} />
-                </button>
-              </div>
+              ) : (
+                <div className="mx-auto bg-white p-1 rounded-lg">
+                  <ClipboardList className="w-6 h-6 text-blue-600" />
+                </div>
+              )}
+              
+              {/* Close button for mobile and toggle for desktop */}
+              <button
+                onClick={() => {
+                  if (window.innerWidth < 768) {
+                    setIsMobileMenuOpen(false);
+                  } else {
+                    setIsSidebarExpanded(!isSidebarExpanded);
+                  }
+                }}
+                className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                {window.innerWidth < 768 ? <X size={22} /> : (isSidebarExpanded ? <X size={22} /> : <Menu size={22} />)}
+              </button>
             </div>
-          )}
-          {!isSidebarExpanded && (
-            <button
-              onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-              className="p-2 hover:bg-blue-700 rounded-lg transition-colors mx-auto"
-            >
-              <Menu size={22} />
-            </button>
-          )}
+          </div>
         </div>
 
         <nav className="space-y-2">
@@ -622,15 +652,19 @@ export default function Dashboard({ user, onLogout }) {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveMenu(item.id)}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center gap-3 ${activeMenu === item.id
-                  ? "bg-blue-100 text-blue-900"
-                  : "hover:bg-blue-700 hover:text-white"
-                  }`}
+                onClick={() => {
+                  setActiveMenu(item.id);
+                  if (window.innerWidth < 768) setIsMobileMenuOpen(false);
+                }}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center gap-3 ${
+                  activeMenu === item.id
+                    ? "bg-blue-100 text-blue-900"
+                    : "hover:bg-blue-700 hover:text-white"
+                }`}
                 title={!isSidebarExpanded ? item.label : ""}
               >
                 <Icon size={20} />
-                {isSidebarExpanded && <span>{item.label}</span>}
+                {(isSidebarExpanded || window.innerWidth < 768) && <span>{item.label}</span>}
               </button>
             );
           })}
@@ -651,7 +685,7 @@ export default function Dashboard({ user, onLogout }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-10 overflow-auto">
+      <div className="flex-1 p-4 md:p-10 overflow-auto pt-20 md:pt-10">
         {activeMenu === "Profile" && (
           <div className="max-w-5xl mx-auto space-y-8">
             {/* Personal Info */}

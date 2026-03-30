@@ -12,6 +12,12 @@ const isValidPhone = (phone) => {
   return phoneRegex.test(phone.replace(/\D/g, ''));
 };
 
+// Aadhar validation helper
+const isValidAadhar = (aadhar) => {
+  const aadharRegex = /^\d{12}$/;
+  return aadharRegex.test(aadhar.replace(/\D/g, ''));
+};
+
 // Login form validation
 export const validateLoginForm = (formData) => {
   const errors = {};
@@ -85,6 +91,14 @@ export const validateRegisterForm = (formData, extraFields = []) => {
   
   if (extraFields.includes('address') && !formData.address) {
     errors.address = 'Address is required';
+  }
+
+  if (extraFields.includes('aadharNumber')) {
+    if (!formData.aadharNumber) {
+      errors.aadharNumber = 'Aadhar number is required';
+    } else if (!isValidAadhar(formData.aadharNumber)) {
+      errors.aadharNumber = 'Aadhar number must be 12 digits';
+    }
   }
   
   return errors;

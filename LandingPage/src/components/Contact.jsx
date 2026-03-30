@@ -1,7 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import emailjs from "@emailjs/browser";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadFull } from "tsparticles";
+import particlesConfig from "../../particlesjs-config.json";
 
 const Contact = ({ data }) => {
+  const [init, setInit] = useState(false);
+
+  // this should be run only once per application lifetime
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadFull(engine);
+    }).then(() => {
+      setInit(true);
+    });
+  }, []);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -55,8 +68,15 @@ const Contact = ({ data }) => {
   };
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative py-16 sm:py-20 lg:py-24 bg-gray-900 overflow-hidden">
+      {init && (
+        <Particles
+          id="tsparticles"
+          options={particlesConfig}
+          className="absolute inset-0 pointer-events-auto"
+        />
+      )}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
@@ -77,8 +97,8 @@ const Contact = ({ data }) => {
             {status.message && (
               <div
                 className={`p-4 rounded-lg mb-6 ${status.type === "success"
-                    ? "bg-green-100 text-green-700 border border-green-200"
-                    : "bg-red-100 text-red-700 border border-red-200"
+                  ? "bg-green-100 text-green-700 border border-green-200"
+                  : "bg-red-100 text-red-700 border border-red-200"
                   }`}
               >
                 {status.message}

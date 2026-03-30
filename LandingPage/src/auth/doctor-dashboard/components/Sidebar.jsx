@@ -1,7 +1,7 @@
 import React from 'react'
 import { User, CalendarCheck, X } from 'lucide-react'
 
-const Sidebar = ({ activeTab, onTabClick, doctorName, doctorPhoto, onLogout }) => {
+const Sidebar = ({ activeTab, onTabClick, doctorName, doctorPhoto, onLogout, isMobileOpen, setIsMobileOpen }) => {
   const initials = (doctorName || 'Dr. User')
     .split(' ')
     .filter(Boolean)
@@ -11,8 +11,23 @@ const Sidebar = ({ activeTab, onTabClick, doctorName, doctorPhoto, onLogout }) =
     .toUpperCase()
 
   return (
-    <div className="w-64 bg-blue-600 text-white flex flex-col">
-      {/* Header */}
+    <>
+      {/* Mobile Backdrop */}
+      <div 
+        className={`md:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        onClick={() => setIsMobileOpen(false)}
+      />
+
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-blue-600 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Close button for mobile */}
+        <button 
+          onClick={() => setIsMobileOpen(false)}
+          className="md:hidden absolute top-4 right-4 p-2 hover:bg-blue-700 rounded-lg text-white"
+        >
+          <X size={24} />
+        </button>
+
+        {/* Header */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center overflow-hidden shadow-md">
           {doctorPhoto ? (
@@ -39,7 +54,10 @@ const Sidebar = ({ activeTab, onTabClick, doctorName, doctorPhoto, onLogout }) =
       <nav className="flex-1 px-4">
         <div className="space-y-2">
           <button
-            onClick={() => onTabClick('profile')}
+            onClick={() => {
+              onTabClick('profile');
+              setIsMobileOpen(false);
+            }}
             className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center space-x-3 ${
               activeTab === 'profile' 
                 ? 'bg-blue-500 text-white' 
@@ -50,7 +68,10 @@ const Sidebar = ({ activeTab, onTabClick, doctorName, doctorPhoto, onLogout }) =
             <span className="text-base font-medium text-white">Profile</span>
           </button>
           <button
-            onClick={() => onTabClick('appointments')}
+            onClick={() => {
+              onTabClick('appointments');
+              setIsMobileOpen(false);
+            }}
             className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center space-x-3 ${
               activeTab === 'appointments' 
                 ? 'bg-blue-500 text-white' 
@@ -75,7 +96,8 @@ const Sidebar = ({ activeTab, onTabClick, doctorName, doctorPhoto, onLogout }) =
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 

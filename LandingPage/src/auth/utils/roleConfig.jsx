@@ -11,7 +11,7 @@ export const getRoleConfig = (role) => {
       dashboardTitle: 'Doctor Dashboard',
       icon: <User className="w-6 h-6" />,
       color: 'from-blue-500 to-blue-600',
-      extraFields: ['specialization', 'licenseNumber']
+      extraFields: ['specialization', 'licenseNumber', 'aadharNumber']
     },
     patient: {
       title: 'Patient Login',
@@ -21,7 +21,7 @@ export const getRoleConfig = (role) => {
       dashboardTitle: 'Patient Dashboard',
       icon: <Heart className="w-6 h-6" />,
       color: 'from-green-500 to-green-600',
-      extraFields: ['dateOfBirth', 'gender', 'address']
+      extraFields: ['dateOfBirth', 'gender', 'address', 'aadharNumber']
     },
     staff: {
       title: 'Staff Login',
@@ -31,7 +31,7 @@ export const getRoleConfig = (role) => {
       dashboardTitle: 'Staff Dashboard',
       icon: <Shield className="w-6 h-6" />,
       color: 'from-purple-500 to-purple-600',
-      extraFields: ['licenseNumber']
+      extraFields: ['licenseNumber', 'aadharNumber']
     },
     admin: {
       title: 'Admin Login',
