@@ -1,9 +1,15 @@
-import React from 'react'
-import { X, FileText } from 'lucide-react'
+import React, { useState } from 'react'
+import { X, FileText, Eye, Loader2 } from 'lucide-react'
 import { cancelAppointment } from '../utils/helpers'
+ 
 import ChatbotBubble from '../../../components/ChatbotBubble'
+ 
+import { getPrescriptionUrl } from '../../services/apiService'
+ 
 
 const PatientDetailsModal = ({ patient, onClose, onCancel }) => {
+  const [isDownloading, setIsDownloading] = useState(false)
+
   if (!patient) return null
 
   const handleCancel = () => {
@@ -16,6 +22,7 @@ const PatientDetailsModal = ({ patient, onClose, onCancel }) => {
     }
   }
 
+ 
   const handleDoctorChatMessage = async ({ text, files }) => {
     const query = (text || '').toLowerCase()
     const uploadedCount = Array.isArray(files) ? files.length : 0
@@ -42,7 +49,23 @@ ${uploadedCount > 0 ? `\nUploaded reports received: ${uploadedCount}. I can help
       return 'Based on the available data, please correlate vitals, history, allergies, and uploaded reports before final diagnosis. This assistant provides mock guidance only.'
     }
 
-    return 'Ask me to summarize patient details, review uploaded reports, or answer a specific clinical query.';
+    return 'Ask me to summarize patient details, review uploaded reports, or answer a specific clinical query.';  const handleViewReport = async () => {
+    if (!patient.id) return;
+    
+    setIsDownloading(true);
+    try {
+      const response = await getPrescriptionUrl(patient.id);
+      if (response && response.DownloadURL) {
+        window.open(response.DownloadURL, '_blank');
+      } else {
+        alert('Prescription URL not found. It might not have been uploaded yet.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch prescription URL:', error);
+      alert('Error fetching prescription: ' + error.message);
+    } finally {
+      setIsDownloading(false);
+    }
   }
 
   return (
@@ -121,12 +144,7 @@ ${uploadedCount > 0 ? `\nUploaded reports received: ${uploadedCount}. I can help
                   </p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sugar Level:</label>
-                  <p className="mt-1 text-gray-900 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                    {patient.sugarLevel ? `${patient.sugarLevel} mg/dL` : "Not specified"}
-                  </p>
-                </div>
+
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Chronic Diseases:</label>
@@ -158,19 +176,7 @@ ${uploadedCount > 0 ? `\nUploaded reports received: ${uploadedCount}. I can help
                   </p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Blood Pressure:</label>
-                  <p className="mt-1 text-gray-900 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                    {patient.bloodPressure || "Not specified"}
-                  </p>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Past Disease:</label>
-                  <p className="mt-1 text-gray-900 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 min-h-20">
-                    {patient.pastDisease || "None"}
-                  </p>
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Family History:</label>
@@ -195,6 +201,24 @@ ${uploadedCount > 0 ? `\nUploaded reports received: ${uploadedCount}. I can help
               <FileText size={20} />
               <span>Clinical Notes</span>
             </h3>
+            <div className="mb-4">
+              <button
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors font-medium border ${
+                  isDownloading 
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200'
+                }`}
+                onClick={handleViewReport}
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Eye size={18} />
+                )}
+                <span>{isDownloading ? 'Fetching...' : 'View Report'}</span>
+              </button>
+            </div>
             <div className="bg-gray-50 p-4 rounded-lg border min-h-24">
               <p className="text-gray-700 whitespace-pre-wrap">
                 {patient.notes || "No clinical notes available"}
@@ -223,6 +247,6 @@ ${uploadedCount > 0 ? `\nUploaded reports received: ${uploadedCount}. I can help
     </div>
   )
 }
-
-export default PatientDetailsModal
+}
+export default PatientDetailsModal 
 

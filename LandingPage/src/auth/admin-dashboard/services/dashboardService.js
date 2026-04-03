@@ -1,5 +1,5 @@
 
-import { getAllPatients, getAllDoctors, getAllStaff, getEmployeeAppointments } from '../../services/apiService';
+import { getAllPatients, getAllDoctors, getAllStaff, getEmployeeAppointments, getAllLabCenters } from '../../services/apiService';
 
 // Helper to format date as YYYY-MM-DD
 const formatDate = (date) => {
@@ -8,20 +8,22 @@ const formatDate = (date) => {
 
 export const fetchDashboardStats = async () => {
     try {
-        const [patients, doctors, staff] = await Promise.all([
+        const [patients, doctors, staff, labCenters] = await Promise.all([
             getAllPatients(),
             getAllDoctors(),
-            getAllStaff()
+            getAllStaff(),
+            getAllLabCenters()
         ]);
 
         return {
             patients: patients?.length || 0,
             doctors: doctors?.length || 0,
             staff: staff?.length || 0,
+            labCenters: (Array.isArray(labCenters) ? labCenters.length : (labCenters?.data?.length || 0)) || 0,
         };
     } catch (error) {
         console.error('Error fetching dashboard stats:', error);
-        return { patients: 0, doctors: 0, staff: 0 };
+        return { patients: 0, doctors: 0, staff: 0, labCenters: 0 };
     }
 };
 

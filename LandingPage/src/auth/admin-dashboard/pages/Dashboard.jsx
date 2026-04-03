@@ -7,7 +7,7 @@ import TodayAppointmentsTable from '../components/TodayAppointmentsTable'
 import QuickActions from '../components/QuickActions'
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({ patients: 0, doctors: 0, staff: 0 })
+  const [stats, setStats] = useState({ patients: 0, doctors: 0, staff: 0, labCenters: 0 })
   const [trend, setTrend] = useState([])
   const [bloodGroupData, setBloodGroupData] = useState([])
   const [todayAppointments, setTodayAppointments] = useState([])

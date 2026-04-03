@@ -56,6 +56,7 @@ export default function DoctorForm() {
                         gender: userDetails.Gender || 'Male',
                         address: userDetails.Address || '',
                         dateOfBirth: formatDate(userDetails.DOB),
+                        aadharNumber: userDetails.AadharNumber || '',
                         qualification: profileData?.Qualification || '',
                         specialization: profileData?.Specialization || '',
                         registrationNumber: profileData?.RegistrationNumber || '',
@@ -64,7 +65,6 @@ export default function DoctorForm() {
                         availabilitySchedule: typeof profileData?.AvailabilitySchedule === 'object'
                             ? JSON.stringify(profileData.AvailabilitySchedule)
                             : profileData?.AvailabilitySchedule || '',
-                        aadharNumber: profileData?.AadharNumber || '',
                         panNumber: profileData?.PANNumber || '',
                         accountNumber: profileData?.AccountNumber || '',
                         IFSCCode: profileData?.IFSCCode || '',
@@ -97,14 +97,15 @@ export default function DoctorForm() {
             if (!id || id === 'new') {
                 const registerPayload = {
                     FirstName: form.firstName,
-                    LastName: form.lastName,
+                    LastName: form.lastName || null,
                     Email: form.email,
                     Phone: form.phoneNumber,
                     Password: form.password || 'Doctor@123', // Default if empty
                     RoleID: 2, // Doctor
-                    Gender: form.gender,
-                    DOB: form.dateOfBirth,
-                    Address: form.address
+                    Gender: form.gender || null,
+                    DOB: form.dateOfBirth || null,
+                    AadharNumber: form.aadharNumber,
+                    Address: form.address || null
                 }
                 const registeredUser = await registerAccount(registerPayload)
                 userId = registeredUser.UserID || registeredUser.id
@@ -124,17 +125,16 @@ export default function DoctorForm() {
             }
 
             const profilePayload = {
-                Qualification: form.qualification,
-                Specialization: form.specialization,
-                RegistrationNumber: form.registrationNumber,
-                ExperienceYears: Number(form.yearsExperience),
-                ClinicAddress: form.clinicAddress,
-                AvailabilitySchedule: schedule,
-                AadharNumber: form.aadharNumber,
-                PANNumber: form.panNumber,
-                AccountNumber: form.accountNumber,
-                IFSCCode: form.IFSCCode,
-                Bio: form.bio
+                DProfilePhoto: null,
+                Qualification: form.qualification || null,
+                Specialization: form.specialization || null,
+                RegistrationNumber: form.registrationNumber || null,
+                ExperienceYears: Number(form.yearsExperience) || 0,
+                ClinicAddress: form.clinicAddress || null,
+                AvailabilitySchedule: schedule || null,
+                PANNumber: form.panNumber || null,
+                AccountNumber: form.accountNumber || null,
+                IFSCCode: form.IFSCCode || null
             }
 
             await createOrUpdateDoctorProfile(userId, profilePayload)
@@ -230,7 +230,21 @@ export default function DoctorForm() {
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600">Specialization</label>
-                            <input className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.specialization || ''} onChange={(e) => update('specialization', e.target.value)} required />
+                            <select 
+                                className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                                value={form.specialization || ''} 
+                                onChange={(e) => update('specialization', e.target.value)} 
+                                required
+                            >
+                                <option value="">Select Specialization</option>
+                                <option value="General Physician">General Physician</option>
+                                <option value="Gynecologist">Gynecologist</option>
+                                <option value="Cardiologist">Cardiologist</option>
+                                <option value="Dermatologist">Dermatologist</option>
+                                <option value="Orthopedic">Orthopedic</option>
+                                <option value="Pediatrician">Pediatrician</option>
+                                <option value="Psychiatrist">Psychiatrist</option>
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600">Registration Number</label>
@@ -260,7 +274,7 @@ export default function DoctorForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm text-gray-600">Aadhar Number</label>
-                            <input className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.aadharNumber || ''} onChange={(e) => update('aadharNumber', e.target.value)} maxLength={12} />
+                            <input className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={form.aadharNumber || ''} onChange={(e) => update('aadharNumber', e.target.value)} maxLength={12} required />
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600">PAN Number</label>

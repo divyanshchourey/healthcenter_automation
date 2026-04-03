@@ -42,14 +42,14 @@ export default function AppointmentForm() {
 
     // Doctors list (simple local list matching patient flow)
     const doctors = useMemo(() => ([
-        { id: 1, name: 'Dr. Anya Sharma', specialization: 'Cardiology', qualification: 'MD, DM', years: 15, email: 'anya.sharma@hospital.com' },
-        { id: 2, name: 'Dr. Rohan Verma', specialization: 'Orthopedics', qualification: 'MS (Ortho)', years: 10, email: 'rohan.verma@hospital.com' },
-        { id: 3, name: 'Dr. Priya Singh', specialization: 'Pediatrics', qualification: 'MD (Ped)', years: 12, email: 'priya.singh@hospital.com' },
-        { id: 4, name: 'Dr. Alok Gupta', specialization: 'Neurology', qualification: 'MD, DM (Neuro)', years: 20, email: 'alok.gupta@hospital.com' },
-        { id: 5, name: 'Dr. Neha Kapoor', specialization: 'Dermatology', qualification: 'MD (Derm)', years: 7, email: 'neha.kapoor@hospital.com' },
-        { id: 6, name: 'Dr. Vivek Rao', specialization: 'General Surgery', qualification: 'MS (Gen. Surg)', years: 18, email: 'vivek.rao@hospital.com' },
-        { id: 7, name: 'Dr. Sara Khan', specialization: 'Oncology', qualification: 'MD, DM (Onco)', years: 11, email: 'sara.khan@hospital.com' },
-        { id: 8, name: 'Dr. Arjun Desai', specialization: 'Anesthesiology', qualification: 'MD (Anesth)', years: 25, email: 'arjun.desai@hospital.com' },
+        { id: 1, name: 'Dr. Anya Sharma', specialization: 'Cardiologist', qualification: 'MD, DM', years: 15, email: 'anya.sharma@hospital.com' },
+        { id: 2, name: 'Dr. Rohan Verma', specialization: 'Orthopedic', qualification: 'MS (Ortho)', years: 10, email: 'rohan.verma@hospital.com' },
+        { id: 3, name: 'Dr. Priya Singh', specialization: 'Pediatrician', qualification: 'MD (Ped)', years: 12, email: 'priya.singh@hospital.com' },
+        { id: 4, name: 'Dr. Alok Gupta', specialization: 'Psychiatrist', qualification: 'MD, DM (Neuro)', years: 20, email: 'alok.gupta@hospital.com' },
+        { id: 5, name: 'Dr. Neha Kapoor', specialization: 'Dermatologist', qualification: 'MD (Derm)', years: 7, email: 'neha.kapoor@hospital.com' },
+        { id: 6, name: 'Dr. Vivek Rao', specialization: 'General Physician', qualification: 'MS (Gen. Surg)', years: 18, email: 'vivek.rao@hospital.com' },
+        { id: 7, name: 'Dr. Sara Khan', specialization: 'General Physician', qualification: 'MD, DM (Onco)', years: 11, email: 'sara.khan@hospital.com' },
+        { id: 8, name: 'Dr. Arjun Desai', specialization: 'General Physician', qualification: 'MD (Anesth)', years: 25, email: 'arjun.desai@hospital.com' },
         { id: 9, name: 'Dr. Tina Bose', specialization: 'Gynecology', qualification: 'MS (Gyn)', years: 8, email: 'tina.bose@hospital.com' }
     ]), [])
 

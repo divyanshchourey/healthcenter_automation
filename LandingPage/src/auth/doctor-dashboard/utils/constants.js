@@ -1,6 +1,26 @@
 // Mock data for appointments
 export const appointments = [
   {
+    id: "mock-now",
+    name: "Sam Wilson",
+    time: "12:00 PM",
+    reason: "Follow-up",
+    type: "Consultation",
+    status: "Scheduled",
+    contact: "+91 98765 43210",
+    age: 35,
+    gender: "Male",
+    bloodGroup: "A+",
+    weight: "75",
+    height: "175",
+    allergies: "None",
+    medications: "None",
+    conditions: ["General Checkup"],
+    familyHistory: "None",
+    notes: "Patient is here for a routine follow-up.",
+    date: "2026-03-06"
+  },
+  {
     id: 6,
     name: "Saanvi Gupta",
     time: "10:15 AM",
@@ -13,14 +33,12 @@ export const appointments = [
     bloodGroup: "B+",
     weight: "38",
     height: "145",
-    bloodPressure: "110/70",
-    sugarLevel: "95",
     allergies: "Dust Mites, Pollen",
     medications: "Salbutamol Inhaler (as needed)",
     conditions: ["Asthma"],
-    pastDisease: "Childhood pneumonia (5 years ago)",
     familyHistory: "Father has asthma, mother has allergies",
-    notes: "Patient has been using the inhaler twice this week. Spirometry test scheduled."
+    notes: "Patient has been using the inhaler twice this week. Spirometry test scheduled.",
+    date: "2026-03-06"
   },
   {
     id: 7,
@@ -35,14 +53,12 @@ export const appointments = [
     bloodGroup: "O+",
     weight: "78",
     height: "168",
-    bloodPressure: "135/85",
-    sugarLevel: "110",
     allergies: "None",
     medications: "Ibuprofen 400mg (as needed)",
     conditions: ["Osteoarthritis (suspected)"],
-    pastDisease: "Hypertension (controlled), Type 2 Diabetes (controlled)",
     familyHistory: "Father had diabetes, mother had arthritis",
-    notes: "Patient complains of persistent right knee pain, especially when climbing stairs. X-ray ordered."
+    notes: "Patient complains of persistent right knee pain, especially when climbing stairs. X-ray ordered.",
+    date: "2026-03-06"
   },
   {
     id: 8,
@@ -57,14 +73,12 @@ export const appointments = [
     bloodGroup: "A+",
     weight: "55",
     height: "162",
-    bloodPressure: "115/75",
-    sugarLevel: "88",
     allergies: "None",
     medications: "None",
     conditions: ["Dermatitis"],
-    pastDisease: "None",
     familyHistory: "Sister has eczema",
-    notes: "Sudden onset of itchy red rash on both arms. Patient denies new soaps or lotions."
+    notes: "Sudden onset of itchy red rash on both arms. Patient denies new soaps or lotions.",
+    date: "2026-03-07"
   },
   {
     id: 9,
@@ -79,12 +93,9 @@ export const appointments = [
     bloodGroup: "AB+",
     weight: "82",
     height: "175",
-    bloodPressure: "128/82",
-    sugarLevel: "102",
     allergies: "Codeine",
     medications: "Antibiotics (Amoxicillin)",
     conditions: ["Appendectomy (1 week ago)"],
-    pastDisease: "Appendicitis (1 week ago), Gallstones (3 years ago)",
     familyHistory: "Father had appendicitis at age 45",
     notes: "Incision site healing well. No signs of infection. Sutures to be removed next week."
   },
@@ -101,12 +112,9 @@ export const appointments = [
     bloodGroup: "B-",
     weight: "62",
     height: "158",
-    bloodPressure: "120/78",
-    sugarLevel: "92",
     allergies: "None",
     medications: "Sertraline 50mg",
     conditions: ["Generalized Anxiety Disorder"],
-    pastDisease: "Mild depression (2 years ago)",
     familyHistory: "Mother has anxiety disorder, maternal grandmother had depression",
     notes: "Follow-up on new medication. Patient reports mild side effects but improved mood."
   },
@@ -123,12 +131,9 @@ export const appointments = [
     bloodGroup: "A+",
     weight: "75",
     height: "172",
-    bloodPressure: "130/80",
-    sugarLevel: "98",
     allergies: "None",
     medications: "None",
     conditions: ["Migraine (suspected)"],
-    pastDisease: "Occasional tension headaches",
     familyHistory: "Father and maternal uncle have migraines",
     notes: "Patient reports recurring, severe headaches with light sensitivity. Keeping a headache diary."
   },
@@ -145,12 +150,9 @@ export const appointments = [
     bloodGroup: "O+",
     weight: "18",
     height: "105",
-    bloodPressure: "95/60",
-    sugarLevel: "85",
     allergies: "None",
     medications: "None",
     conditions: [],
-    pastDisease: "None",
     familyHistory: "No significant family history",
     notes: "Scheduled MMR vaccine (Dose 2). Patient is healthy today."
   },
@@ -167,12 +169,9 @@ export const appointments = [
     bloodGroup: "B+",
     weight: "85",
     height: "178",
-    bloodPressure: "138/88",
-    sugarLevel: "105",
     allergies: "None",
     medications: "Antacids",
     conditions: ["GERD"],
-    pastDisease: "Gastritis (1 year ago), Peptic ulcer (3 years ago)",
     familyHistory: "Father has GERD, paternal grandfather had stomach ulcers",
     notes: "Patient reports worsening acid reflux and abdominal pain, especially after meals."
   },
@@ -189,12 +188,9 @@ export const appointments = [
     bloodGroup: "A+",
     weight: "68",
     height: "165",
-    bloodPressure: "118/76",
-    sugarLevel: "94",
     allergies: "None",
     medications: "Levothyroxine 50mcg",
     conditions: ["Hypothyroidism"],
-    pastDisease: "Hyperthyroidism (diagnosed 2 years ago, now hypothyroid post-treatment)",
     familyHistory: "Mother and maternal aunt have hypothyroidism",
     notes: "Reviewing recent TSH lab results. Adjusting medication dosage."
   },
@@ -211,12 +207,9 @@ export const appointments = [
     bloodGroup: "O+",
     weight: "88",
     height: "170",
-    bloodPressure: "140/90",
-    sugarLevel: "115",
     allergies: "None",
     medications: "Atorvastatin 20mg",
     conditions: ["High Cholesterol"],
-    pastDisease: "Hyperlipidemia (5 years), Pre-diabetes (1 year)",
     familyHistory: "Father had heart attack at age 55, mother has high cholesterol",
     notes: "Routine annual checkup. Full blood panel ordered. Discussed diet and exercise."
   }
