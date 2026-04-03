@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { User, Calendar, FileText, Menu, X, Clock, CheckCircle, CreditCard, ClipboardList } from "lucide-react";
 import { jsPDF } from "jspdf";
 import Appointment from "../components/Appointment";
+import ChatbotBubble from "../../../components/ChatbotBubble";
 import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientAppointments, getAllDoctors } from "../../services/apiService";
 
 export default function Dashboard({ user, onLogout }) {
@@ -1557,6 +1558,8 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
       </div>
+
+      <ChatbotBubble title="Patient Support Bot" />
     </div>
   );
 }

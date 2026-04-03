@@ -1,6 +1,7 @@
 import React from 'react'
 import { X, FileText } from 'lucide-react'
 import { cancelAppointment } from '../utils/helpers'
+import ChatbotBubble from '../../../components/ChatbotBubble'
 
 const PatientDetailsModal = ({ patient, onClose, onCancel }) => {
   if (!patient) return null
@@ -13,6 +14,35 @@ const PatientDetailsModal = ({ patient, onClose, onCancel }) => {
       }
       onClose()
     }
+  }
+
+  const handleDoctorChatMessage = async ({ text, files }) => {
+    const query = (text || '').toLowerCase()
+    const uploadedCount = Array.isArray(files) ? files.length : 0
+
+    if (query.includes('summary') || query.includes('summarize')) {
+      return `Patient Summary:
+- Name: ${patient.name || 'N/A'}
+- Age/Gender: ${patient.age || 'N/A'} / ${patient.gender || 'N/A'}
+- Reason: ${patient.reason || 'General Consultation'}
+- Allergies: ${patient.allergies || 'None'}
+- Chronic Diseases: ${patient.chronicDiseases || (patient.conditions?.join(', ') || 'None')}
+- Current Medications: ${patient.medications || 'None'}
+- Notes: ${patient.notes || 'No clinical notes'}
+${uploadedCount > 0 ? `\nUploaded reports received: ${uploadedCount}. I can help summarize each report based on your questions.` : ''}`
+    }
+
+    if (query.includes('report') || query.includes('upload')) {
+      return uploadedCount > 0
+        ? `Received ${uploadedCount} uploaded file(s): ${files.join(', ')}. This is a mock analysis flow; ask for "summary" to get a clinical overview.`
+        : 'Upload patient reports (PDF/images) using the attachment button and I will help summarize them.'
+    }
+
+    if (query.includes('risk') || query.includes('diagnosis')) {
+      return 'Based on the available data, please correlate vitals, history, allergies, and uploaded reports before final diagnosis. This assistant provides mock guidance only.'
+    }
+
+    return 'Ask me to summarize patient details, review uploaded reports, or answer a specific clinical query.';
   }
 
   return (
@@ -189,6 +219,7 @@ const PatientDetailsModal = ({ patient, onClose, onCancel }) => {
           </div>
         </div>
       </div>
+      <ChatbotBubble title="Doctor Clinical Assistant" onSendMessage={handleDoctorChatMessage} />
     </div>
   )
 }
