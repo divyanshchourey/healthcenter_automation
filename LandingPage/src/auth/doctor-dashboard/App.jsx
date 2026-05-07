@@ -370,7 +370,7 @@ const handleDoctorDashboardChatMessage = async ({ text, files }) => {
     return 'Please type a question or upload a report.';
   }
 
-  let systemContext = "You are a clinical assistant for your Doctor you can provide insights and help them summarize the patient's condition in consize and point to point manner. ";
+  let systemContext = "You are a clinical assistant for your Doctor you can provide insights and help them summarize the patient's condition in consize and point to point manner.Remember to keep responses very short and simple but you can uuse medical jargon as the user is a doctor ";
   if (activePatient) {
     systemContext += `Current Patient Context: 
     Name: ${activePatient.name}, 

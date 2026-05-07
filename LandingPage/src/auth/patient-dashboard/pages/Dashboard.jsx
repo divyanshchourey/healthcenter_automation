@@ -13,7 +13,7 @@ export default function Dashboard({ user, onLogout }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [patientName, setPatientName] = useState(user?.name || "Patient");
   const [appointments, setAppointments] = useState([]);
-  const [isSaving, setIsSaving, isMobileMenuOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     email: user?.email || "",
     phoneNumber: "",
@@ -571,7 +571,7 @@ export default function Dashboard({ user, onLogout }) {
       -Weight: ${formData.weight || "Not specified"} kg
       -Height: ${formData.height || "Not specified"} cm
       - Gender: "Male"
-      - Age: "20 years"
+      - Age: "21 years"
       - Blood Group: ${formData.bloodGroup || "Not Specicified"}
       - Allergies: ${formData.allergies || "None reported"}
       - Chronic Diseases: ${formData.chronicDiseases || "None reported"}
@@ -579,7 +579,8 @@ export default function Dashboard({ user, onLogout }) {
       
       Your goal is to explain medical terms simply and help them understand their health journey. 
       If they ask about symptoms related to their chronic diseases, be supportive.
-      CRITICAL: Always tell the patient to consult their doctor for final medical decisions.Keep the responses short and simple, and avoid medical jargon.
+      CRITICAL: Always tell the patient to consult their doctor for final medical decisions.
+      Keep the responses very short and simple, and avoid medical jargon.
     `;
 
     try {
