@@ -17,15 +17,16 @@ import {
 const STATUS_OPTIONS = ['All', 'Pending', 'Approved', 'Rejected'];
 
 const COMMON_TESTS = [
-    { id: 5, name: "Complete Blood Count (CBC)", price: 200 },
-    { id: 6, name: "Lipid Profile", price: 600 },
-    { id: 7, name: "Thyroid Profile", price: 500 },
-    { id: 8, name: "Kidney Function Test (KFT/RFT)", price: 700 },
-    { id: 9, name: "Liver Function Test (LFT)", price: 700 },
-    { id: 10, name: "Diabetes Monitoring", price: 600 },
-    { id: 11, name: "C-Reactive Protein (CRP)", price: 500 },
-    { id: 12, name: "Iron Studies", price: 800 },
-    { id: 13, name: "Coagulation Tests", price: 900 }
+    { id: 101, name: "Blood Test (CBC)", price: 300 },
+    { id: 102, name: "X-Ray (Chest X-Ray)", price: 500 },
+    { id: 103, name: "MRI (Brain MRI)", price: 3500 },
+    { id: 104, name: "CT Scan (Full Body)", price: 2500 },
+    { id: 105, name: "Urine Test (Routine)", price: 200 },
+    { id: 106, name: "ECG (Heart Test)", price: 400 },
+    { id: 107, name: "Lipid Profile (Cholesterol)", price: 600 },
+    { id: 108, name: "Thyroid (Hormone Test)", price: 700 },
+    { id: 109, name: "LFT (Liver Test)", price: 800 },
+    { id: 110, name: "KFT (Kidney Test)", price: 900 }
 ];
 
 // helpers moved to apiService.js

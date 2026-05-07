@@ -26,6 +26,7 @@ export default function Dashboard({ user, onLogout }) {
     chronicDiseases: "",
     riskCategory: "",
     lifestyle: "",
+    aadharNumber: "",
   });
 
   const SPECIALTY_PRICES = {
@@ -99,15 +100,16 @@ export default function Dashboard({ user, onLogout }) {
   ];
 
   const commonTests = [
-    { id: 5, name: "Complete Blood Count (CBC)", price: 200 },
-    { id: 6, name: "Lipid Profile", price: 600 },
-    { id: 7, name: "Thyroid Profile", price: 500 },
-    { id: 8, name: "Kidney Function Test (KFT/RFT)", price: 700 },
-    { id: 9, name: "Liver Function Test (LFT)", price: 700 },
-    { id: 10, name: "Diabetes Monitoring", price: 600 },
-    { id: 11, name: "C-Reactive Protein (CRP)", price: 500 },
-    { id: 12, name: "Iron Studies", price: 800 },
-    { id: 13, name: "Coagulation Tests", price: 900 }
+    { id: 101, name: "Blood Test (CBC)", price: 300 },
+    { id: 102, name: "X-Ray (Chest X-Ray)", price: 500 },
+    { id: 103, name: "MRI (Brain MRI)", price: 3500 },
+    { id: 104, name: "CT Scan (Full Body)", price: 2500 },
+    { id: 105, name: "Urine Test (Routine)", price: 200 },
+    { id: 106, name: "ECG (Heart Test)", price: 400 },
+    { id: 107, name: "Lipid Profile (Cholesterol)", price: 600 },
+    { id: 108, name: "Thyroid (Hormone Test)", price: 700 },
+    { id: 109, name: "LFT (Liver Test)", price: 800 },
+    { id: 110, name: "KFT (Kidney Test)", price: 900 }
   ];
 
   const [selectedLabId, setSelectedLabId] = useState("");
@@ -122,7 +124,7 @@ export default function Dashboard({ user, onLogout }) {
   const [isLoadingLabs, setIsLoadingLabs] = useState(false);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
-  const [docBillStatuses, setDocBillStatuses] = useState({});
+
 
   const labBills = useMemo(() => {
     return labBookings.map(booking => {
@@ -134,8 +136,8 @@ export default function Dashboard({ user, onLogout }) {
         testName: test?.name || `Investigation #${booking.InvestigationID}`,
         date: booking.date || booking.InvestigationDate,
         amount: test?.price || 0,
-        status: (booking.status || booking.Status) === "Completed" ? "Paid" : "Pending",
-        paymentMethod: "N/A"
+        status: (booking.BookingID || booking.id) ? "Paid" : ((booking.status || booking.Status) === "Completed" ? "Paid" : "Pending"),
+        paymentMethod: (booking.BookingID || booking.id) ? "Cash" : "N/A"
       };
     });
   }, [labBookings, labCenters, commonTests]);
@@ -415,6 +417,7 @@ export default function Dashboard({ user, onLogout }) {
           gender: userDetails?.Gender ?? "",
           address: userDetails?.Address ?? "",
           dateOfBirth: formatDateForInput(userDetails?.DOB),
+          aadharNumber: profile?.AadharNumber || userDetails?.AadharNumber || "",
         }));
 
         // Fetch appointments for Records section
@@ -440,7 +443,8 @@ export default function Dashboard({ user, onLogout }) {
               date: appDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
               rawDate: app.DateTime,
               time: appDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-              status: (category === 'past' && (app.Status === "Scheduled" || !app.Status)) ? "Completed" : (app.Status || "Scheduled"),
+              status: app.Status || (category === 'past' ? "Completed" : "Scheduled"),
+              paymentMethod: app.Method || "N/A",
               type: category === 'past' ? 'previous' : category,
               amount: amount,
               description: "Doctor Consultation Fee"
@@ -509,36 +513,7 @@ export default function Dashboard({ user, onLogout }) {
     fetchPrescriptionsData();
   }, [activeMenu, user?.userId]);
 
-  useEffect(() => {
-    if (activeMenu === "Billing" && appointments.length > 0) {
-      const checkBills = async () => {
-        let hasChanges = false;
-        const newStatuses = {};
-        
-        await Promise.all(
-          appointments.map(async (app) => {
-            // We only need to check if we don't know the status yet
-            if (docBillStatuses[app.id] === undefined && newStatuses[app.id] === undefined) {
-              try {
-                await getBillDetails(app.id);
-                newStatuses[app.id] = true;
-                hasChanges = true;
-              } catch (error) {
-                newStatuses[app.id] = false;
-                hasChanges = true;
-              }
-            }
-          })
-        );
-        
-        if (hasChanges) {
-          setDocBillStatuses(prev => ({ ...prev, ...newStatuses }));
-        }
-      };
-      
-      checkBills();
-    }
-  }, [activeMenu, appointments]); // only run when activeMenu or appointments change
+
 
   const menuItems = [
     { id: "Profile", label: "Profile", icon: User },
@@ -570,7 +545,8 @@ export default function Dashboard({ user, onLogout }) {
         FamilyHistory: formData.familyHistory,
         ChronicDiseases: formData.chronicDiseases,
         RiskCategory: formData.riskCategory,
-        Lifestyle: formData.lifestyle
+        Lifestyle: formData.lifestyle,
+        AadharNumber: formData.aadharNumber
       };
 
       await createOrUpdatePatientProfile(user.userId, data);
@@ -611,20 +587,20 @@ export default function Dashboard({ user, onLogout }) {
 
       {/* Sidebar */}
       <div
-        className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white p-6 transition-all duration-300 shadow-md border rounded-r-lg flex flex-col fixed inset-y-0 left-0 z-50 md:relative ${
-          isSidebarExpanded ? "w-64" : "w-20"
+        className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white transition-all duration-300 shadow-md border rounded-r-lg flex flex-col fixed inset-y-0 left-0 z-50 md:relative ${
+          isSidebarExpanded ? "w-64 p-6" : "w-20 py-6 px-2"
         } ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} transition-transform duration-300 ease-in-out`}
       >
-        <div className="flex justify-between items-center mb-10">
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-full">
+            <div className={`flex items-center ${isSidebarExpanded ? "justify-between" : "justify-center flex-col gap-4"}`}>
               {isSidebarExpanded ? (
                 <div>
                   <h2 className="text-lg font-semibold">Welcome Back,</h2>
                   <h1 className="text-xl font-bold">{patientName}</h1>
                 </div>
               ) : (
-                <div className="mx-auto bg-white p-1 rounded-lg">
+                <div className="bg-white p-1.5 rounded-lg shadow-sm">
                   <ClipboardList className="w-6 h-6 text-blue-600" />
                 </div>
               )}
@@ -639,6 +615,7 @@ export default function Dashboard({ user, onLogout }) {
                   }
                 }}
                 className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+                title={isSidebarExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
               >
                 {window.innerWidth < 768 ? <X size={22} /> : (isSidebarExpanded ? <X size={22} /> : <Menu size={22} />)}
               </button>
@@ -656,7 +633,9 @@ export default function Dashboard({ user, onLogout }) {
                   setActiveMenu(item.id);
                   if (window.innerWidth < 768) setIsMobileMenuOpen(false);
                 }}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center gap-3 ${
+                className={`w-full py-3 rounded-lg font-medium transition-all flex items-center ${
+                  isSidebarExpanded ? "px-4 gap-3" : "justify-center"
+                } ${
                   activeMenu === item.id
                     ? "bg-blue-100 text-blue-900"
                     : "hover:bg-blue-700 hover:text-white"
@@ -671,17 +650,18 @@ export default function Dashboard({ user, onLogout }) {
         </nav>
 
         {/* Logout Button */}
-        {isSidebarExpanded && (
-          <div className="mt-auto pt-4 border-t border-blue-400">
-            <button
-              onClick={onLogout}
-              className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center gap-3 hover:bg-red-600 hover:text-white bg-red-500 text-white"
-            >
-              <X size={20} />
-              <span>Logout</span>
-            </button>
-          </div>
-        )}
+        <div className={`mt-auto pt-4 border-t border-blue-400 ${!isSidebarExpanded && "flex justify-center"}`}>
+          <button
+            onClick={onLogout}
+            className={`w-full py-3 rounded-lg font-medium transition-all flex items-center hover:bg-red-600 hover:text-white bg-red-500 text-white ${
+              isSidebarExpanded ? "px-4 gap-3" : "justify-center"
+            }`}
+            title={!isSidebarExpanded ? "Logout" : ""}
+          >
+            <X size={20} />
+            {isSidebarExpanded && <span>Logout</span>}
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -745,6 +725,18 @@ export default function Dashboard({ user, onLogout }) {
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:ring-2 focus:ring-blue-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-500">Aadhar Number</label>
+                  <input
+                    type="text"
+                    name="aadharNumber"
+                    value={formData.aadharNumber}
+                    onChange={handleChange}
+                    placeholder="Enter 12-digit Aadhar number"
+                    maxLength={12}
                     className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:ring-2 focus:ring-blue-400"
                   />
                 </div>
@@ -1048,15 +1040,15 @@ export default function Dashboard({ user, onLogout }) {
                           ₹{bill.amount.toLocaleString("en-IN")}
                         </p>
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${docBillStatuses[bill.id]
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${bill.status === "Paid"
                             ? "bg-green-100 text-green-700"
                             : "bg-yellow-100 text-yellow-700"
                             }`}
                         >
-                          {docBillStatuses[bill.id] ? "Paid" : "Pending"}
+                          {bill.status}
                         </span>
                         <p className="text-xs text-gray-500">
-                          Payment: N/A
+                          Payment: {bill.paymentMethod}
                         </p>
                       </div>
                     </div>
@@ -1113,7 +1105,7 @@ export default function Dashboard({ user, onLogout }) {
                         {bill.status}
                       </span>
                       <p className="text-xs text-gray-500">
-                        Payment: {bill.paymentMethod}
+                        Payment: {bill.status === "Paid" ? "Cash" : "N/A"}
                       </p>
                     </div>
                   </div>

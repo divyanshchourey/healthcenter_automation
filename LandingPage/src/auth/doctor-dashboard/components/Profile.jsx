@@ -21,7 +21,7 @@ const Profile = ({ profileData, onProfileChange, onSave }) => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Profile</h1>
-      
+
       <div className="space-y-8">
         {/* Personal Information Section */}
         <div>
@@ -240,6 +240,17 @@ const Profile = ({ profileData, onProfileChange, onSave }) => {
                 className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter IFSC Code"
                 maxLength={12}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bio:</label>
+              <textarea
+                value={profileData.bio}
+                onChange={(e) => onProfileChange('bio', e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Tell us about yourself..."
               />
             </div>
 

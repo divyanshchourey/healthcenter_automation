@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { ClipboardList, Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Profile from './components/Profile'
 import AppointmentsList from './components/AppointmentsList'
@@ -81,7 +82,8 @@ const App = ({ user, onLogout }) => {
     yearsExperience: '',
     availabilitySchedule: '',
     panNumber: '',
-    IFSCCode: ''
+    IFSCCode: '',
+    bio: ''
   })
 
   const handleTabClick = (tab) => {
@@ -132,15 +134,19 @@ const App = ({ user, onLogout }) => {
           setDoctorName(`Dr. ${user.name}`);
         }
 
-        // Fetch profile image signed URL
-        let photoUrl = doctorProfile?.PhotoUrl || '';
+        // Fetch profile image signed URL from profile data or signed URL service
+        console.log('DEBUG: doctorProfile fetched:', doctorProfile);
+        let photoUrl = doctorProfile?.DProfilePhoto || doctorProfile?.PhotoUrl || doctorProfile?.photoUrl || doctorProfile?.photo_url || '';
+        
         try {
           const imageRes = await getDoctorProfileImage();
+          console.log('DEBUG: imageRes fetched:', imageRes);
           if (imageRes?.DownloadURL) {
             photoUrl = imageRes.DownloadURL;
           }
         } catch (error) {
-          console.log('Failed to fetch profile image URL:', error);
+          console.warn('Failed to fetch profile image URL from signed URL service:', error.message);
+          // If we already have a URL from the profile, don't worry about the signed URL failing
         }
 
         // Update profileData with fetched data
@@ -166,10 +172,11 @@ const App = ({ user, onLogout }) => {
               : JSON.stringify(doctorProfile.AvailabilitySchedule))
             : '',
           // Financial info
-          aadharNumber: doctorProfile?.AadharNumber || '',
+          aadharNumber: doctorProfile?.AadharNumber || userDetails?.AadharNumber || '',
           panNumber: doctorProfile?.PANNumber || '',
           accountNumber: doctorProfile?.AccountNumber || '',
           IFSCCode: doctorProfile?.IFSCCode || '',
+          bio: doctorProfile?.Bio || '',
         }));
       } catch (error) {
         console.error("Failed to fetch doctor data:", error);
@@ -325,18 +332,23 @@ const App = ({ user, onLogout }) => {
         ExperienceYears: profileData.yearsExperience ? Number(profileData.yearsExperience) : 0,
         ClinicAddress: profileData.clinicAddress || '',
         AvailabilitySchedule: (() => {
+          let schedule = profileData.availabilitySchedule;
           try {
-            // Try to parse if it's a JSON string, otherwise send empty object to satisfy schema
-            const parsed = JSON.parse(profileData.availabilitySchedule);
-            return (parsed && typeof parsed === 'object') ? parsed : {};
+            if (schedule && typeof schedule === 'string' && (schedule.trim().startsWith('{') || schedule.trim().startsWith('['))) {
+              const parsed = JSON.parse(schedule);
+              return (parsed && typeof parsed === 'object') ? parsed : schedule;
+            }
           } catch (e) {
-            return {};
+            // Keep as string if parsing fails
           }
+          return schedule || "";
         })(),
         AadharNumber: profileData.aadharNumber || '',
         PANNumber: profileData.panNumber || '',
         AccountNumber: profileData.accountNumber || '',
-        IFSCCode: profileData.IFSCCode || ''
+        IFSCCode: profileData.IFSCCode || '',
+        Bio: profileData.bio || '',
+        DProfilePhoto: (finalPhotoUrl && finalPhotoUrl.startsWith('http')) ? finalPhotoUrl : ''
       };
 
       console.log('Sending profile payload:', payload);
@@ -344,7 +356,7 @@ const App = ({ user, onLogout }) => {
       alert('Profile saved successfully!');
     } catch (error) {
       console.error('Failed to save profile:', error);
-      alert('saved');
+      alert('Failed to save profile. Please try again.');
     }
   }
 
@@ -358,7 +370,7 @@ const App = ({ user, onLogout }) => {
           </div>
           <span className="font-bold text-lg leading-tight tracking-tight">HealthCenter</span>
         </div>
-        <button 
+        <button
           onClick={() => setIsSidebarOpen(true)}
           className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
         >

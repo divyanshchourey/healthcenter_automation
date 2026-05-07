@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://health-center-automation-backend.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://127.0.0.1:8000';
 
 export const API_ENDPOINTS = {
   AUTH_REGISTER: '/auth/register',

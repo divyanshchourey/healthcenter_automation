@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Filter, Trash2 } from 'lucide-react'
-import { getEmployeeAppointments, deleteAppointment } from '../../../services/apiService'
+import { getEmployeeAppointments, deleteAppointment, getAllDoctors, getAllPatients } from '../../../services/apiService'
 
 const getStatusColor = (status) => {
     if (!status) return 'bg-gray-100 text-gray-800'
@@ -19,12 +19,45 @@ export default function AppointmentsList() {
     const [showFilter, setShowFilter] = useState(false)
     const [filterStatus, setFilterStatus] = useState('all')
     const [filterType, setFilterType] = useState('all')
+    const [doctors, setDoctors] = useState([])
+    const [patients, setPatients] = useState([])
 
     const fetchAppointments = async (date) => {
         setLoading(true)
         try {
+            // First fetch lookup data if not already fetched
+            let currentDoctors = doctors;
+            let currentPatients = patients;
+
+            if (doctors.length === 0 || patients.length === 0) {
+                const [dRes, pRes] = await Promise.all([getAllDoctors(), getAllPatients()]);
+                currentDoctors = Array.isArray(dRes) ? dRes : (dRes?.data || []);
+                currentPatients = Array.isArray(pRes) ? pRes : (pRes?.data || []);
+                setDoctors(currentDoctors);
+                setPatients(currentPatients);
+            }
+
             const data = await getEmployeeAppointments(date)
-            setAppointments(data)
+            const appointmentsArray = Array.isArray(data) ? data : (data?.data || []);
+            
+            // Format and resolve names
+            const resolved = appointmentsArray.map(app => {
+                const patient = currentPatients.find(p => (p.UserID || p.id || p.PatientID) === app.PatientID);
+                const doctor = currentDoctors.find(d => (d.UserID || d.id || d.DoctorID) === app.DoctorID);
+                const appDate = new Date(app.DateTime);
+                
+                return {
+                    id: app.AppointmentID || app.id,
+                    time: appDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    name: patient ? `${patient.FirstName} ${patient.LastName || ''}`.trim() : `Patient #${app.PatientID}`,
+                    doctorName: doctor ? `Dr. ${doctor.FirstName} ${doctor.LastName || ''}`.trim() : `Doctor #${app.DoctorID}`,
+                    reason: app.Type || '-',
+                    type: app.Type || '-',
+                    status: app.Status || 'Scheduled'
+                };
+            });
+            
+            setAppointments(resolved)
         } catch (error) {
             console.error("Error fetching appointments:", error)
         } finally {

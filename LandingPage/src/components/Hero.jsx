@@ -27,8 +27,7 @@ const Hero = ({ data }) => {
           src={data.videoUrl}
           title="Health Center Automation Video"
           frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture; muted"
-          allowFullScreen
+          allow="autoplay; fullscreen; picture-in-picture"
           onLoad={handleVideoLoad}
         ></iframe>
 

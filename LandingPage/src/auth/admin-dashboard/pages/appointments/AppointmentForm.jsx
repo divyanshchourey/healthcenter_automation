@@ -5,7 +5,7 @@ import { fetchAppointmentById, fetchPatients, saveAppointment } from '../../serv
 export default function AppointmentForm() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const [form, setForm] = useState({ patientId: '', patientName: '', date: '', time: '', doctor: '', status: 'Scheduled' })
+    const [form, setForm] = useState({ patientId: '', patientName: '', date: '', time: '', doctor: '', status: 'Scheduled', type: '' })
     const [loading, setLoading] = useState(false)
 
     // Admin flow specific state
@@ -63,7 +63,7 @@ export default function AppointmentForm() {
         setSelectedDoctor(d)
         setIsModalOpen(true)
         setStep(1)
-        setForm((f) => ({ ...f, doctor: d.name }))
+        setForm((f) => ({ ...f, doctor: d.name, type: d.specialization }))
     }
 
     function closeModal() { setIsModalOpen(false) }

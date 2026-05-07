@@ -6,7 +6,7 @@ export default function DashboardLayout({ userName, onLogout, children }) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const linkBase = "w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center gap-3"
+  const linkBase = `w-full py-3 rounded-lg font-medium transition-all flex items-center ${sidebarOpen ? 'px-4 gap-3' : 'justify-center'}`
 
   function linkClass(to) {
     const isActive = location.pathname === to || (to !== "/admin/dashboard" && location.pathname.startsWith(to))
@@ -49,9 +49,9 @@ export default function DashboardLayout({ userName, onLogout, children }) {
       )}
 
       <aside
-        className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white p-6 flex flex-col transition-all duration-300 shadow-md fixed inset-y-0 left-0 z-50 md:relative transform ${sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0 md:w-20'}`}
+        className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white flex flex-col transition-all duration-300 shadow-md fixed inset-y-0 left-0 z-50 md:relative transform ${sidebarOpen ? 'translate-x-0 w-64 p-6' : '-translate-x-full md:translate-x-0 md:w-20 py-6 px-2'}`}
       >
-        <div className="flex justify-between items-center mb-10">
+        <div className={`flex items-center mb-10 ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
           {sidebarOpen && (
             <div>
               <h2 className="text-lg font-semibold">Welcome Back</h2>
@@ -60,7 +60,7 @@ export default function DashboardLayout({ userName, onLogout, children }) {
           )}
           <button
             onClick={() => setSidebarOpen((s) => !s)}
-            className={`p-2 hover:bg-blue-700 rounded-lg transition-colors ${sidebarOpen ? '' : 'mx-auto'}`}
+            className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
             aria-label="Toggle sidebar"
           >
             <span className="block w-5 h-0.5 bg-white mb-1"></span>
@@ -100,7 +100,7 @@ export default function DashboardLayout({ userName, onLogout, children }) {
         <div className="pt-4 border-t border-blue-400 mt-4">
           <button
             onClick={handleLogout}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center gap-3 hover:bg-red-500 hover:text-white text-white ${sidebarOpen ? '' : 'justify-center'}`}
+            className={`w-full py-3 rounded-lg font-medium transition-all flex items-center hover:bg-red-500 hover:text-white text-white ${sidebarOpen ? 'px-4 gap-3' : 'justify-center'}`}
           >
             <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

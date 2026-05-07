@@ -74,7 +74,7 @@ const Profile = ({ user }) => {
           joinDate: formatDateForInput(employeeProfile?.JoinDate),
           role: employeeProfile?.Designation || '',
           // Financial information from Employees table
-          aadharNumber: employeeProfile?.AadharNumber || '',
+          aadharNumber: employeeProfile?.AadharNumber || userDetails?.AadharNumber || '',
           panNumber: employeeProfile?.PANNumber || '',
           accountNumber: employeeProfile?.AccountNumber || '',
           ifscCode: employeeProfile?.IFSCCode || '',
@@ -298,21 +298,6 @@ const Profile = ({ user }) => {
           {/* Professional Information */}
           <h4 className="text-lg font-semibold mb-3">Professional Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <label className="block text-sm text-gray-500">Role</label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 border rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                <option value="">Select Role</option>
-                <option value="doctor">Doctor</option>
-                <option value="nurse">Nurse</option>
-                <option value="staff">Staff</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
 
             <div>
               <label className="block text-sm text-gray-500">Department</label>

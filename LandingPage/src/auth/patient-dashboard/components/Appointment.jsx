@@ -112,7 +112,7 @@ const Appointment = ({ user, healthData }) => {
         user_id: parseInt(user?.userId, 10), // Some backend routes might expect user_id
         DoctorID: parseInt(selectedDoctor.id, 10),
         DateTime: dateTimeStr,
-        Type: "General Checkup",
+        Type: selectedDoctor.specialization || "General Checkup",
         Status: "Scheduled",
         // Health metrics (included as mentioned in previous error report)
         Height: healthData?.height ? parseFloat(healthData.height) : null,
