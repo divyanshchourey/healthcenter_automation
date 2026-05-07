@@ -12,7 +12,7 @@ export default function Dashboard({ user, onLogout }) {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [patientName, setPatientName] = useState(user?.name || "Patient");
   const [appointments, setAppointments] = useState([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving, isMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: user?.email || "",
     phoneNumber: "",
