@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { User, Calendar, FileText, Menu, X, Clock, CheckCircle, CreditCard, ClipboardList } from "lucide-react";
 import { jsPDF } from "jspdf";
 import Appointment from "../components/Appointment";
-import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientCategorizedAppointments, getAllDoctors, getPatientAvailableLabs, bookLabTest, getPatientLabBookings, getPatientPrescriptions, getBillDetails } from "../../services/apiService";
+import ChatbotBubble from "../../../components/ChatbotBubble";
+// import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientAppointments, getAllDoctors } from "../../services/apiService";
+import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientCategorizedAppointments, getAllDoctors, getPatientAvailableLabs, bookLabTest, getPatientLabBookings, getPatientPrescriptions, getBillDetails, sendChatToAI } from "../../services/apiService";
 
 
 export default function Dashboard({ user, onLogout }) {
@@ -11,7 +13,7 @@ export default function Dashboard({ user, onLogout }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [patientName, setPatientName] = useState(user?.name || "Patient");
   const [appointments, setAppointments] = useState([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving, isMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: user?.email || "",
     phoneNumber: "",
@@ -559,6 +561,35 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+  const handlePatientChatMessage = async ({ text }) => {
+    const userId = user?.userId || "patient_test_id";
+
+    const patientSystemPrompt = `
+      You are a friendly Health Assistant for ${patientName}. 
+      
+      Patient Context:
+      -Weight: ${formData.weight || "Not specified"} kg
+      -Height: ${formData.height || "Not specified"} cm
+      - Gender: "Male"
+      - Age: "20 years"
+      - Blood Group: ${formData.bloodGroup || "Not Specicified"}
+      - Allergies: ${formData.allergies || "None reported"}
+      - Chronic Diseases: ${formData.chronicDiseases || "None reported"}
+      - Lifestyle: ${formData.lifestyle || "Not specified"}
+      
+      Your goal is to explain medical terms simply and help them understand their health journey. 
+      If they ask about symptoms related to their chronic diseases, be supportive.
+      CRITICAL: Always tell the patient to consult their doctor for final medical decisions.Keep the responses short and simple, and avoid medical jargon.
+    `;
+
+    try {
+      const aiReply = await sendChatToAI('184', text, patientSystemPrompt);
+      return aiReply;
+    } catch (error) {
+      console.error("Chatbot Error:", error);
+      return "I'm having a little trouble connecting to my medical database. Please try again in a moment!";
+    }
+  };
   return (
     <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white overflow-hidden">
       {/* Mobile Header */}
@@ -1479,6 +1510,8 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
       </div>
+
+      <ChatbotBubble title="Patient Support Bot" onSendMessage={handlePatientChatMessage} />
     </div>
   );
 }

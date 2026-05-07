@@ -4,8 +4,10 @@ import Sidebar from './components/Sidebar'
 import Profile from './components/Profile'
 import AppointmentsList from './components/AppointmentsList'
 import PatientDetailsModal from './components/PatientDetailsModal'
+import ChatbotBubble from '../../components/ChatbotBubble'
 import { appointments } from './utils/constants'
 import { getUser, getDoctorProfile, getDoctorAppointments, createOrUpdateDoctorProfile, uploadDoctorProfileImage, getDoctorProfileImage, getPatientProfile } from '../services/apiService'
+import { sendChatToAI } from '../services/apiService'
 
 const PATIENT_STORAGE_KEY = 'health_admin_patients_v1'
 
@@ -360,6 +362,35 @@ const App = ({ user, onLogout }) => {
     }
   }
 
+const handleDoctorDashboardChatMessage = async ({ text, files }) => {
+  const activePatient = selectedPatient;
+  const userId = user?.id || "doctor_demo";
+
+  if (!text && (!files || files.length === 0)) {
+    return 'Please type a question or upload a report.';
+  }
+
+  let systemContext = "You are a clinical assistant for your Doctor you can provide insights and help them summarize the patient's condition in consize and point to point manner. ";
+  if (activePatient) {
+    systemContext += `Current Patient Context: 
+    Name: ${activePatient.name}, 
+    Reason: ${activePatient.reason}, 
+    Allergies: ${activePatient.allergies || 'None'}, 
+    Meds: ${activePatient.medications || 'None'}. `;
+  }
+
+  try {
+    const UserPrompt = text;
+    const systemMessage = systemContext;
+    const aiReply = await sendChatToAI(userId, UserPrompt, systemMessage);
+    
+    return aiReply;
+  } catch (error) {
+    console.error("Chatbot Error:", error);
+    return "I'm having trouble reaching the AI server. Please check your connection.";
+  }
+};
+
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row overflow-hidden">
       {/* Mobile Top Bar */}
@@ -415,6 +446,11 @@ const App = ({ user, onLogout }) => {
           onCancel={handleCancelAppointment}
         />
       )}
+
+      <ChatbotBubble
+        title="Doctor Dashboard Assistant"
+        onSendMessage={handleDoctorDashboardChatMessage}
+      />
     </div>
   )
 }

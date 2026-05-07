@@ -762,3 +762,23 @@ export const getPatientPrescriptions = async () => {
   });
   return handleResponse(response);
 };
+
+export const sendChatToAI = async (userId, message, systemMessage) => {
+  const url = buildUrl(API_ENDPOINTS.AI_ANALYZE);
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      message: message,
+      system_prompt: systemMessage
+    }),
+  });
+
+  const data = await handleResponse(response); 
+  
+  return data.reply; 
+};
