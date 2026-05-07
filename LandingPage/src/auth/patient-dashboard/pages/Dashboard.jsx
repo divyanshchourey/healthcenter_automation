@@ -3,8 +3,8 @@ import { User, Calendar, FileText, Menu, X, Clock, CheckCircle, CreditCard, Clip
 import { jsPDF } from "jspdf";
 import Appointment from "../components/Appointment";
 import ChatbotBubble from "../../../components/ChatbotBubble";
-import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientAppointments, getAllDoctors } from "../../services/apiService";
-import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientCategorizedAppointments, getAllDoctors, getPatientAvailableLabs, bookLabTest, getPatientLabBookings, getPatientPrescriptions, getBillDetails } from "../../services/apiService";
+// import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientAppointments, getAllDoctors } from "../../services/apiService";
+import { getPatientProfile, getUser, createOrUpdatePatientProfile, getPatientCategorizedAppointments, getAllDoctors, getPatientAvailableLabs, bookLabTest, getPatientLabBookings, getPatientPrescriptions, getBillDetails, sendChatToAI } from "../../services/apiService";
 
 
 export default function Dashboard({ user, onLogout }) {
@@ -584,8 +584,61 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+  const handlePatientChatMessage = async ({ text }) => {
+    const userId = user?.userId || "patient_test_id";
+
+    const patientSystemPrompt = `
+      You are a friendly Health Assistant for ${patientName}. 
+      
+      Patient Context:
+      -Weight: ${formData.weight || "Not specified"} kg
+      -Height: ${formData.height || "Not specified"} cm
+      - Gender: "Male"
+      - Age: "20 years"
+      - Blood Group: ${formData.bloodGroup || "Not Specicified"}
+      - Allergies: ${formData.allergies || "None reported"}
+      - Chronic Diseases: ${formData.chronicDiseases || "None reported"}
+      - Lifestyle: ${formData.lifestyle || "Not specified"}
+      
+      Your goal is to explain medical terms simply and help them understand their health journey. 
+      If they ask about symptoms related to their chronic diseases, be supportive.
+      CRITICAL: Always tell the patient to consult their doctor for final medical decisions.Keep the responses short and simple, and avoid medical jargon.
+    `;
+
+    try {
+      const aiReply = await sendChatToAI('184', text, patientSystemPrompt);
+      return aiReply;
+    } catch (error) {
+      console.error("Chatbot Error:", error);
+      return "I'm having a little trouble connecting to my medical database. Please try again in a moment!";
+    }
+  };
   return (
-    <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="flex h-screen bg-gradient-to-b from-blue-50 to-white overflow-hidden">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-blue-600 flex items-center justify-between px-4 z-40 shadow-md text-white">
+        <div className="flex items-center gap-2">
+          <div className="bg-white p-1 rounded-lg">
+            <ClipboardList className="w-6 h-6 text-blue-600" />
+          </div>
+          <span className="font-bold text-lg">HealthCenter</span>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Sidebar Backdrop (Mobile) */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <div
         className={`bg-gradient-to-b from-blue-500 to-blue-500 text-white p-6 transition-all duration-300 shadow-md border rounded-lg flex flex-col ${isSidebarExpanded ? "w-64" : "w-20"
@@ -1456,7 +1509,7 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
-      <ChatbotBubble title="Patient Support Bot" />
+      <ChatbotBubble title="Patient Support Bot" onSendMessage={handlePatientChatMessage} />
     </div>
   );
 }

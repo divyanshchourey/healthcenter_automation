@@ -25,7 +25,7 @@ const ChatbotBubble = ({ title = "Health Assistant", onSendMessage }) => {
     {
       id: "welcome",
       sender: "bot",
-      text: "Hi! Upload your reports and ask your health-related queries here.",
+      text: "Hi! This is your Medical AI Assistant.",
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     },
   ]);
@@ -41,12 +41,13 @@ const ChatbotBubble = ({ title = "Health Assistant", onSendMessage }) => {
     const text = input.trim();
     if (!text && !hasFiles) return;
 
+    let replyText = "No response recieved.Sorry, I encountered an error connecting to the AI.";
     const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
     const userMessage = {
       id: `user-${Date.now()}`,
       sender: "user",
-      text: text || "Uploaded reports for review.",
+      text: text || "hey there!",
       files: uploadedFiles.map((f) => f.name),
       time: now,
     };
@@ -54,23 +55,29 @@ const ChatbotBubble = ({ title = "Health Assistant", onSendMessage }) => {
     setInput("");
     setUploadedFiles([]);
 
-    let replyText = defaultBotReply(text);
+    const typingId = `bot-typing-${Date.now()}`;
+    setMessages((prev) => [...prev, {
+      id: typingId,
+      sender: "bot",
+      text: "AI is thinking...",
+      time: now,
+    }]);
     if (onSendMessage) {
       try {
         const custom = await onSendMessage({ text, files: userMessage.files });
         if (typeof custom === "string" && custom.trim()) replyText = custom;
       } catch {
-        // Fallback to default reply when custom handler fails.
+        replyText = "Sorry, I encountered an error connecting to the AI.";
       }
     }
-
-    const botMessage = {
-      id: `bot-${Date.now() + 1}`,
-      sender: "bot",
-      text: replyText,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-    setMessages((prev) => [...prev, botMessage]);
+    setMessages((prev) => 
+      prev.map(m => m.id === typingId ? { 
+        ...m, 
+        id: `bot-${Date.now()}`, 
+        text: replyText, 
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) 
+      } : m)
+    );
   };
 
   return (

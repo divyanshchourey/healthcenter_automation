@@ -43,6 +43,7 @@ export const API_ENDPOINTS = {
   PAY_LAB_BILL: (labId, bookingId) => `/lab/${labId}/bookings/${bookingId}/bill/pay`,
   GET_PRESCRIPTION_URL: (appointmentId) => `/doctor/appointments/${appointmentId}/prescription/download`,
   GET_PATIENT_PRESCRIPTIONS: '/patient/prescriptions',
+  AI_ANALYZE: '/ai/analyze',
 };
 
 export const PATIENT_ROLE_ID = Number(

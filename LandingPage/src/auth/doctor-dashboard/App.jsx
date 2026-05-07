@@ -6,6 +6,7 @@ import PatientDetailsModal from './components/PatientDetailsModal'
 import ChatbotBubble from '../../components/ChatbotBubble'
 import { appointments } from './utils/constants'
 import { getUser, getDoctorProfile, getDoctorAppointments, createOrUpdateDoctorProfile, uploadDoctorProfileImage, getDoctorProfileImage, getPatientProfile } from '../services/apiService'
+import { sendChatToAI } from '../services/apiService'
 
 const PATIENT_STORAGE_KEY = 'health_admin_patients_v1'
 
@@ -348,41 +349,34 @@ const App = ({ user, onLogout }) => {
     }
   }
 
-  const handleDoctorDashboardChatMessage = async ({ text, files }) => {
-    const query = (text || '').toLowerCase()
-    const uploadedFiles = Array.isArray(files) ? files : []
-    const activePatient = selectedPatient
+const handleDoctorDashboardChatMessage = async ({ text, files }) => {
+  const activePatient = selectedPatient;
+  const userId = user?.id || "doctor_demo";
 
-    if (query.includes('summary') || query.includes('summarize')) {
-      if (!activePatient) {
-        return 'Select a patient from appointments first, then ask for "summary" so I can generate a patient-focused overview.'
-      }
-      return `Patient Summary:
-- Name: ${activePatient.name || 'N/A'}
-- Age/Gender: ${activePatient.age || 'N/A'} / ${activePatient.gender || 'N/A'}
-- Reason: ${activePatient.reason || 'General Consultation'}
-- Blood Group: ${activePatient.bloodGroup || 'Not specified'}
-- Allergies: ${activePatient.allergies || 'None'}
-- Chronic Diseases: ${activePatient.chronicDiseases || (activePatient.conditions?.join(', ') || 'None')}
-- Current Medications: ${activePatient.medications || 'None'}
-${uploadedFiles.length ? `\nUploaded report files: ${uploadedFiles.join(', ')}` : ''}`
-    }
-
-    if (query.includes('report') || query.includes('upload')) {
-      return uploadedFiles.length
-        ? `Received ${uploadedFiles.length} file(s): ${uploadedFiles.join(', ')}. Ask "summarize reports" for a concise mock summary.`
-        : 'Upload patient reports (PDF/images) using the attachment icon, then ask me to summarize them.'
-    }
-
-    if (query.includes('patient') || query.includes('query')) {
-      if (!activePatient) {
-        return 'No patient is selected currently. Open a patient from Appointments to get patient-specific query support.'
-      }
-      return `You are asking about ${activePatient.name}. I can help with a mock summary of vitals, conditions, medications, and uploaded reports.`
-    }
-
-    return 'Ask me to summarize patient details, summarize uploaded reports, or answer a patient-specific query.'
+  if (!text && (!files || files.length === 0)) {
+    return 'Please type a question or upload a report.';
   }
+
+  let systemContext = "You are a clinical assistant for your Doctor you can provide insights and help them summarize the patient's condition in consize and point to point manner. ";
+  if (activePatient) {
+    systemContext += `Current Patient Context: 
+    Name: ${activePatient.name}, 
+    Reason: ${activePatient.reason}, 
+    Allergies: ${activePatient.allergies || 'None'}, 
+    Meds: ${activePatient.medications || 'None'}. `;
+  }
+
+  try {
+    const UserPrompt = text;
+    const systemMessage = systemContext;
+    const aiReply = await sendChatToAI(userId, UserPrompt, systemMessage);
+    
+    return aiReply;
+  } catch (error) {
+    console.error("Chatbot Error:", error);
+    return "I'm having trouble reaching the AI server. Please check your connection.";
+  }
+};
 
   return (
     <div className="min-h-screen bg-white flex">
